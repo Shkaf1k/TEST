@@ -6,68 +6,101 @@
     <title>Godot Dev Hub</title>
     <style>
         :root {
-            --bg-dark: #121212;
-            --panel-bg: #1a1a1a;
-            --card-bg: #1e1e1e;
-            --accent-red: #ff3b3b;
+            --bg-dark: #0d0e12;
+            --panel-bg: rgba(22, 24, 31, 0.75);
+            --card-bg: rgba(28, 31, 41, 0.7);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --accent-red: #ff3b5c;
+            --accent-red-glow: rgba(255, 59, 92, 0.35);
             --accent-blue: #3b82f6;
             --accent-gold: #f59e0b;
             --accent-purple: #8b5cf6;
-            --border-color: #2e2e2e;
-            --text-main: #ffffff;
-            --text-muted: #aaaaaa;
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
         }
 
         * { box-sizing: border-box; }
 
         body {
             background-color: var(--bg-dark);
+            background-image: 
+                radial-gradient(at 20% 20%, rgba(255, 59, 92, 0.05) 0px, transparent 50%),
+                radial-gradient(at 80% 80%, rgba(59, 130, 246, 0.05) 0px, transparent 50%);
+            background-attachment: fixed;
             color: var(--text-main);
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             margin: 0;
             padding: 0;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
-            overflow-x: hidden; /* Защита от горизонтальной прокрутки страницы */
+            overflow-x: hidden;
         }
 
         header {
-            min-height: 60px;
+            min-height: 65px;
             background: var(--panel-bg);
-            border-bottom: 1px solid var(--border-color);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--card-border);
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 10px 20px;
+            padding: 10px 24px;
             flex-wrap: wrap;
-            gap: 10px;
+            gap: 12px;
+            position: sticky;
+            top: 0;
+            z-index: 50;
         }
 
-        .logo { font-size: 1.1rem; font-weight: bold; letter-spacing: 1px; color: #fff; }
+        .logo { 
+            font-size: 1.15rem; 
+            font-weight: 800; 
+            letter-spacing: 1.5px; 
+            color: #fff;
+            text-shadow: 0 0 12px var(--accent-red-glow);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
         .nav-tabs { display: flex; gap: 8px; flex-wrap: wrap; }
 
         .nav-btn {
             background: transparent;
-            border: none;
+            border: 1px solid transparent;
             color: var(--text-muted);
-            padding: 6px 10px;
-            border-radius: 4px;
+            padding: 8px 14px;
+            border-radius: 8px;
             font-size: 0.85rem;
+            font-weight: 600;
             cursor: pointer;
-            transition: 0.2s;
+            transition: all 0.25s ease;
             white-space: nowrap;
         }
 
-        .nav-btn:hover, .nav-btn.active { color: #fff; background: #2a2a2a; }
+        .nav-btn:hover { 
+            color: #fff; 
+            background: rgba(255, 255, 255, 0.05); 
+        }
+
+        .nav-btn.active { 
+            color: #fff; 
+            background: rgba(255, 59, 92, 0.15);
+            border-color: rgba(255, 59, 92, 0.4);
+            box-shadow: 0 0 12px var(--accent-red-glow);
+        }
 
         #global-announcement {
-            background: rgba(255, 59, 59, 0.15);
-            border-bottom: 1px solid var(--accent-red);
+            background: linear-gradient(90deg, rgba(255, 59, 92, 0.2), rgba(139, 92, 246, 0.2));
+            backdrop-filter: blur(8px);
+            border-bottom: 1px solid rgba(255, 59, 92, 0.3);
             color: #fff;
             text-align: center;
             padding: 10px 15px;
             font-size: 0.85rem;
+            font-weight: 500;
             display: none;
             word-break: break-word;
         }
@@ -76,204 +109,240 @@
             flex: 1;
             max-width: 900px;
             width: 100%;
-            margin: 20px auto;
-            padding: 0 15px;
+            margin: 25px auto;
+            padding: 0 16px;
         }
 
         .section-title {
             text-align: center;
-            font-size: 1.2rem;
+            font-size: 1.25rem;
+            font-weight: 800;
             letter-spacing: 2px;
             text-transform: uppercase;
-            margin-bottom: 20px;
+            margin-bottom: 24px;
             color: #ffffff;
+            background: linear-gradient(180deg, #ffffff 0%, #9ca3af 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
         .games-grid { display: flex; flex-direction: column; gap: 20px; align-items: center; width: 100%; }
 
         .game-card {
             background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
             width: 100%;
-            max-width: 500px;
-            padding: 20px 15px;
+            max-width: 520px;
+            padding: 20px;
             text-align: center;
-            transition: border-color 0.2s;
+            transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
             position: relative;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
         }
 
-        .game-card:hover { border-color: #444; }
+        .game-card:hover { 
+            border-color: rgba(255, 255, 255, 0.2); 
+            transform: translateY(-3px);
+            box-shadow: 0 12px 32px rgba(0,0,0,0.4);
+        }
 
         .game-cover {
             width: 100%;
-            max-height: 220px;
+            max-height: 240px;
             object-fit: cover;
-            border-radius: 4px;
-            margin-bottom: 15px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            border: 1px solid var(--card-border);
         }
 
-        .game-title { font-size: 1.1rem; font-weight: bold; margin: 0 0 8px 0; color: #ffffff; word-break: break-word; }
-        .game-desc { color: var(--text-muted); font-size: 0.85rem; line-height: 1.4; margin-bottom: 15px; word-break: break-word; }
+        .game-title { font-size: 1.2rem; font-weight: 700; margin: 0 0 8px 0; color: #ffffff; word-break: break-word; }
+        .game-desc { color: var(--text-muted); font-size: 0.88rem; line-height: 1.5; margin-bottom: 16px; word-break: break-word; }
 
         .game-author { 
-            font-size: 0.75rem; 
-            color: #777; 
-            margin-bottom: 12px; 
+            font-size: 0.78rem; 
+            color: #888; 
+            margin-bottom: 14px; 
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 4px;
+            gap: 6px;
             flex-wrap: wrap;
         }
 
-        .card-actions { display: flex; justify-content: center; align-items: center; gap: 15px; flex-wrap: wrap; }
+        .card-actions { display: flex; justify-content: center; align-items: center; gap: 16px; flex-wrap: wrap; }
 
         a.btn-download-link {
-            color: var(--accent-red);
+            background: linear-gradient(135deg, var(--accent-red) 0%, #d92644 100%);
+            color: #fff;
+            padding: 9px 18px;
+            border-radius: 8px;
             font-size: 0.85rem;
-            font-weight: bold;
+            font-weight: 700;
             text-decoration: none;
-            transition: opacity 0.2s;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 14px var(--accent-red-glow);
         }
 
-        a.btn-download-link:hover { opacity: 0.8; text-decoration: underline; }
+        a.btn-download-link:hover { 
+            transform: scale(1.03); 
+            box-shadow: 0 6px 20px var(--accent-red-glow);
+        }
 
         .btn-delete-link {
-            background: transparent;
-            border: none;
-            color: #777;
-            font-size: 0.85rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--card-border);
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            padding: 8px 12px;
+            border-radius: 8px;
             cursor: pointer;
-            transition: color 0.2s;
-            padding: 0;
+            transition: all 0.2s;
         }
 
-        .btn-delete-link:hover { color: var(--accent-red); text-decoration: underline; }
+        .btn-delete-link:hover { color: var(--accent-red); border-color: rgba(255, 59, 92, 0.4); background: rgba(255, 59, 92, 0.1); }
 
         .profile-header {
-            background: var(--panel-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
             overflow: hidden;
             margin-bottom: 20px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
         }
 
-        .profile-banner { height: 120px; background: #222; background-size: cover; background-position: center; }
+        .profile-banner { height: 130px; background: #181a20; background-size: cover; background-position: center; }
 
-        .profile-info { padding: 15px; position: relative; }
+        .profile-info { padding: 16px; position: relative; }
 
         .profile-avatar {
-            width: 80px;
-            height: 80px;
+            width: 84px;
+            height: 84px;
             border-radius: 50%;
-            border: 3px solid var(--panel-bg);
-            background: #252525;
+            border: 3px solid #16181f;
+            background: #20232c;
             position: absolute;
-            top: -40px;
-            left: 15px;
+            top: -42px;
+            left: 16px;
             object-fit: cover;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
         }
 
-        .profile-details { margin-left: 95px; }
+        .profile-details { margin-left: 98px; }
 
-        .profile-name { font-size: 1.15rem; margin: 0; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; word-break: break-word; }
-        .profile-bio { color: var(--text-muted); margin: 6px 0 0 0; font-size: 0.85rem; word-break: break-word; }
+        .profile-name { font-size: 1.2rem; font-weight: 700; margin: 0; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; word-break: break-word; }
+        .profile-bio { color: var(--text-muted); margin: 6px 0 0 0; font-size: 0.85rem; line-height: 1.4; word-break: break-word; }
 
-        .admin-badge { background: var(--accent-red); color: #fff; font-size: 0.65rem; padding: 2px 6px; border-radius: 3px; font-weight: bold; }
-        .verified-badge { color: var(--accent-blue); font-size: 0.9rem; line-height: 1; }
-        .dev-badge { background: var(--accent-gold); color: #000; font-size: 0.65rem; padding: 2px 6px; border-radius: 3px; font-weight: bold; }
+        .admin-badge { background: var(--accent-red); color: #fff; font-size: 0.65rem; padding: 2px 7px; border-radius: 4px; font-weight: 800; }
+        .verified-badge { color: var(--accent-blue); font-size: 0.95rem; line-height: 1; }
+        .dev-badge { background: var(--accent-gold); color: #000; font-size: 0.65rem; padding: 2px 7px; border-radius: 4px; font-weight: 800; }
 
         .card-panel {
-            background: var(--panel-bg);
-            padding: 20px 15px;
-            border-radius: 6px;
-            border: 1px solid var(--border-color);
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            padding: 22px 18px;
+            border-radius: 12px;
+            border: 1px solid var(--card-border);
             max-width: 750px;
             margin: 0 auto 20px auto;
             width: 100%;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
         }
 
-        label { display: block; color: var(--text-muted); font-size: 0.8rem; margin-bottom: 6px; }
+        label { display: block; color: var(--text-muted); font-size: 0.82rem; font-weight: 600; margin-bottom: 8px; }
 
         input[type="text"], input[type="email"], input[type="password"], textarea {
             width: 100%;
-            padding: 10px;
-            margin-bottom: 15px;
-            border-radius: 4px;
-            border: 1px solid var(--border-color);
-            background: #121212;
+            padding: 11px 14px;
+            margin-bottom: 16px;
+            border-radius: 8px;
+            border: 1px solid var(--card-border);
+            background: rgba(13, 14, 18, 0.6);
             color: #fff;
             outline: none;
             font-family: inherit;
             font-size: 0.9rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        input[type="text"]:focus, input[type="email"]:focus, input[type="password"]:focus, textarea:focus {
+            border-color: rgba(255, 59, 92, 0.5);
+            box-shadow: 0 0 10px var(--accent-red-glow);
         }
 
         input[type="file"] {
             width: 100%;
-            padding: 8px;
-            margin-bottom: 15px;
-            border-radius: 4px;
-            border: 1px dashed var(--border-color);
-            background: #121212;
+            padding: 10px;
+            margin-bottom: 16px;
+            border-radius: 8px;
+            border: 1px dashed rgba(255, 255, 255, 0.2);
+            background: rgba(13, 14, 18, 0.4);
             color: var(--text-muted);
             cursor: pointer;
-            font-size: 0.8rem;
+            font-size: 0.82rem;
         }
 
         button.btn-primary {
             width: 100%;
-            padding: 11px;
-            background: var(--accent-red);
+            padding: 12px;
+            background: linear-gradient(135deg, var(--accent-red) 0%, #d92644 100%);
             color: #fff;
             border: none;
-            font-weight: bold;
+            font-weight: 700;
             font-size: 0.85rem;
             cursor: pointer;
-            border-radius: 4px;
+            border-radius: 8px;
             text-transform: uppercase;
             letter-spacing: 1px;
-            transition: opacity 0.2s;
+            transition: all 0.25s ease;
+            box-shadow: 0 4px 14px var(--accent-red-glow);
         }
 
-        button.btn-primary:hover { opacity: 0.9; }
+        button.btn-primary:hover { 
+            transform: translateY(-1px);
+            box-shadow: 0 6px 18px var(--accent-red-glow);
+        }
 
         .stat-box {
             display: flex;
             justify-content: space-around;
-            background: #121212;
-            padding: 12px;
-            border-radius: 4px;
+            background: rgba(13, 14, 18, 0.6);
+            padding: 14px;
+            border-radius: 8px;
             margin-bottom: 20px;
-            border: 1px solid var(--border-color);
+            border: 1px solid var(--card-border);
         }
 
         .stat-item { text-align: center; }
-        .stat-value { font-size: 1.2rem; font-weight: bold; color: var(--accent-red); }
-        .stat-label { font-size: 0.7rem; color: var(--text-muted); }
+        .stat-value { font-size: 1.3rem; font-weight: 800; color: var(--accent-red); }
+        .stat-label { font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
 
-        /* Оболочка для адаптивности таблицы */
         .table-responsive {
             width: 100%;
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
             margin-top: 10px;
+            border-radius: 8px;
+            border: 1px solid var(--card-border);
         }
 
         .admin-users-list {
             width: 100%;
             border-collapse: collapse;
-            font-size: 0.8rem;
-            min-width: 500px; /* Чтобы таблица красиво скроллилась на моб */
+            font-size: 0.82rem;
+            min-width: 520px;
+            background: rgba(13, 14, 18, 0.4);
         }
 
         .admin-users-list th, .admin-users-list td {
-            padding: 8px;
-            border-bottom: 1px solid var(--border-color);
+            padding: 10px 12px;
+            border-bottom: 1px solid var(--card-border);
             text-align: left;
         }
 
-        .admin-users-list th { color: var(--text-muted); font-weight: normal; }
+        .admin-users-list th { color: var(--text-muted); font-weight: 600; background: rgba(255, 255, 255, 0.03); }
 
         .user-clickable {
             cursor: pointer;
@@ -282,54 +351,65 @@
             transition: opacity 0.2s;
         }
 
-        .user-clickable:hover { opacity: 0.8; text-decoration: underline; }
+        .user-clickable:hover { opacity: 0.8; }
 
         .user-row-avatar {
-            width: 26px;
-            height: 26px;
+            width: 28px;
+            height: 28px;
             border-radius: 50%;
             vertical-align: middle;
-            margin-right: 6px;
+            margin-right: 8px;
             object-fit: cover;
         }
 
         .btn-action-small {
-            background: #252525;
-            border: 1px solid var(--border-color);
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--card-border);
             color: #fff;
-            padding: 4px 6px;
-            border-radius: 3px;
+            padding: 5px 8px;
+            border-radius: 6px;
             cursor: pointer;
-            font-size: 0.7rem;
+            font-size: 0.72rem;
             margin-right: 3px;
             margin-bottom: 3px;
             display: inline-block;
+            transition: all 0.2s;
         }
 
-        .btn-action-small:hover { background: #333; }
-        .btn-action-danger { color: #ff5555; border-color: #ff5555; }
-        .btn-action-blue { color: var(--accent-blue); border-color: var(--accent-blue); }
-        .btn-action-gold { color: var(--accent-gold); border-color: var(--accent-gold); }
+        .btn-action-small:hover { background: rgba(255, 255, 255, 0.15); }
+        .btn-action-danger { color: #ff5555; border-color: rgba(255, 85, 85, 0.3); }
+        .btn-action-blue { color: var(--accent-blue); border-color: rgba(59, 130, 246, 0.3); }
+        .btn-action-gold { color: var(--accent-gold); border-color: rgba(245, 158, 11, 0.3); }
 
         /* Оверлеи / Модалки */
         #auth-overlay, #banned-overlay, #maintenance-overlay, #user-modal-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.92);
+            background: rgba(5, 6, 8, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             display: flex;
             justify-content: center;
             align-items: center;
             z-index: 100;
-            padding: 15px;
+            padding: 16px;
+            animation: fadeIn 0.25s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
 
         .auth-card {
             width: 100%;
             max-width: 380px;
             background: var(--panel-bg);
-            padding: 20px;
-            border-radius: 6px;
-            border: 1px solid var(--border-color);
+            backdrop-filter: blur(16px);
+            padding: 24px;
+            border-radius: 12px;
+            border: 1px solid var(--card-border);
+            box-shadow: 0 16px 40px rgba(0,0,0,0.5);
         }
 
         .user-modal-card {
@@ -337,10 +417,11 @@
             max-width: 450px;
             max-height: 90vh;
             overflow-y: auto;
-            background: var(--panel-bg);
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
+            background: #14161d;
+            border-radius: 12px;
+            border: 1px solid var(--card-border);
             position: relative;
+            box-shadow: 0 16px 40px rgba(0,0,0,0.6);
         }
 
         .modal-close-btn {
@@ -348,46 +429,50 @@
             top: 10px;
             right: 12px;
             background: rgba(0,0,0,0.6);
-            border: none;
+            border: 1px solid var(--card-border);
             color: #fff;
             font-size: 1.1rem;
             border-radius: 50%;
-            width: 28px;
-            height: 28px;
+            width: 30px;
+            height: 30px;
             cursor: pointer;
             z-index: 10;
+            transition: background 0.2s;
         }
 
-        .tab-buttons { display: flex; gap: 8px; margin-bottom: 15px; }
+        .modal-close-btn:hover { background: rgba(255, 59, 92, 0.4); }
+
+        .tab-buttons { display: flex; gap: 8px; margin-bottom: 18px; }
         .tab-btn { 
-            flex: 1; padding: 8px; background: #121212; 
-            border: 1px solid var(--border-color); color: var(--text-muted); 
-            border-radius: 4px; cursor: pointer; font-size: 0.85rem;
+            flex: 1; padding: 10px; background: rgba(13, 14, 18, 0.6); 
+            border: 1px solid var(--card-border); color: var(--text-muted); 
+            border-radius: 8px; cursor: pointer; font-size: 0.85rem; font-weight: 600;
+            transition: all 0.2s;
         }
-        .tab-btn.active { color: #fff; border-color: var(--accent-red); background: #222; }
+        .tab-btn.active { color: #fff; border-color: rgba(255, 59, 92, 0.4); background: rgba(255, 59, 92, 0.15); }
 
         /* МЕДИА-ЗАПРОСЫ ДЛЯ ТЕЛЕФОНОВ */
         @media (max-width: 600px) {
             header {
                 justify-content: center;
-                padding: 10px 5px;
+                padding: 10px 8px;
             }
 
-            .logo { width: 100%; text-align: center; font-size: 1rem; }
+            .logo { width: 100%; text-align: center; justify-content: center; font-size: 1.05rem; }
             .nav-tabs { width: 100%; justify-content: center; gap: 4px; }
-            .nav-btn { font-size: 0.75rem; padding: 5px 8px; }
+            .nav-btn { font-size: 0.78rem; padding: 6px 10px; }
 
             .profile-avatar {
-                width: 65px;
-                height: 65px;
-                top: -32px;
-                left: 10px;
+                width: 68px;
+                height: 68px;
+                top: -34px;
+                left: 12px;
             }
-            .profile-details { margin-left: 75px; }
-            .profile-name { font-size: 1rem; }
+            .profile-details { margin-left: 80px; }
+            .profile-name { font-size: 1.05rem; }
             .profile-bio { font-size: 0.8rem; }
 
-            .card-panel { padding: 15px 10px; }
+            .card-panel { padding: 16px 12px; }
         }
     </style>
 </head>
@@ -426,25 +511,25 @@
                 </div>
             </div>
 
-            <div style="padding: 15px;">
-                <div style="display:flex; justify-content:space-between; font-size:0.8rem; color:var(--text-muted); margin-bottom:15px; background:#121212; padding:8px 12px; border-radius:4px;">
+            <div style="padding: 16px;">
+                <div style="display:flex; justify-content:space-between; font-size:0.8rem; color:var(--text-muted); margin-bottom:15px; background:rgba(13, 14, 18, 0.6); padding:10px 14px; border-radius:8px; border:1px solid var(--card-border);">
                     <span>Статус: <b id="modal-user-status" style="color:#fff;">Активен</b></span>
                     <span>Игр выложено: <b id="modal-user-games-count" style="color:var(--accent-red);">0</b></span>
                 </div>
 
                 <h4 style="margin: 0 0 10px 0; color:#fff; font-size:0.85rem;">🛠️ Модерация Профиля:</h4>
                 <div style="display:flex; flex-direction:column; gap:8px;">
-                    <button class="btn-primary" style="background:#333; font-size:0.75rem; padding:8px;" onclick="adminResetProfileData()">🧹 Сбросить Аватар и Био</button>
-                    <div style="display:flex; gap:5px;">
-                        <button class="btn-action-small btn-action-blue" style="flex:1; padding:8px;" id="modal-btn-verify" onclick="modalToggleVerify()">Выдать ☑️</button>
-                        <button class="btn-action-small btn-action-gold" style="flex:1; padding:8px;" id="modal-btn-dev" onclick="modalToggleDev()">Выдать 👑 DEV</button>
+                    <button class="btn-primary" style="background:rgba(255,255,255,0.1); box-shadow:none; font-size:0.75rem; padding:9px;" onclick="adminResetProfileData()">🧹 Сбросить Аватар и Био</button>
+                    <div style="display:flex; gap:6px;">
+                        <button class="btn-action-small btn-action-blue" style="flex:1; padding:9px;" id="modal-btn-verify" onclick="modalToggleVerify()">Выдать ☑️</button>
+                        <button class="btn-action-small btn-action-gold" style="flex:1; padding:9px;" id="modal-btn-dev" onclick="modalToggleDev()">Выдать 👑 DEV</button>
                     </div>
-                    <div style="display:flex; gap:5px;">
-                        <button class="btn-action-small" style="flex:1; padding:8px; border-color:var(--accent-purple); color:var(--accent-purple);" id="modal-btn-admin" onclick="modalToggleAdmin()">ADMIN</button>
-                        <button class="btn-action-small" style="flex:1; padding:8px;" id="modal-btn-mute" onclick="modalToggleMute()">Мут</button>
-                        <button class="btn-action-small btn-action-danger" style="flex:1; padding:8px;" id="modal-btn-ban" onclick="modalToggleBan()">Бан</button>
+                    <div style="display:flex; gap:6px;">
+                        <button class="btn-action-small" style="flex:1; padding:9px; border-color:var(--accent-purple); color:var(--accent-purple);" id="modal-btn-admin" onclick="modalToggleAdmin()">ADMIN</button>
+                        <button class="btn-action-small" style="flex:1; padding:9px;" id="modal-btn-mute" onclick="modalToggleMute()">Мут</button>
+                        <button class="btn-action-small btn-action-danger" style="flex:1; padding:9px;" id="modal-btn-ban" onclick="modalToggleBan()">Бан</button>
                     </div>
-                    <button class="btn-primary" style="background:#8b0000; font-size:0.75rem; margin-top:5px; padding:8px;" onclick="adminDeleteUserAccount()">❌ Удалить Аккаунт Навсегда</button>
+                    <button class="btn-primary" style="background:#8b0000; box-shadow:none; font-size:0.75rem; margin-top:6px; padding:9px;" onclick="adminDeleteUserAccount()">❌ Удалить Аккаунт Навсегда</button>
                 </div>
             </div>
         </div>
@@ -455,7 +540,7 @@
         <div class="auth-card" style="text-align: center;">
             <h2 style="color: var(--accent-gold); margin-top:0;">🛠️ Технические работы</h2>
             <p style="color: var(--text-muted); font-size: 0.85rem;">Платформа находится на техобслуживании. Попробуйте зайти позже.</p>
-            <button class="btn-primary" style="background:#333;" onclick="handleLogout()">Выйти</button>
+            <button class="btn-primary" style="background:#222; box-shadow:none;" onclick="handleLogout()">Выйти</button>
         </div>
     </div>
 
@@ -540,7 +625,7 @@
             </div>
 
             <div class="card-panel">
-                <h3 style="color: #fff; margin-top: 0; font-size: 0.95rem; margin-bottom: 15px;">Редактировать профиль</h3>
+                <h3 style="color: #fff; margin-top: 0; font-size: 0.95rem; margin-bottom: 16px;">Редактировать профиль</h3>
                 
                 <label>Загрузить Аватарку:</label>
                 <input type="file" id="edit-avatar-file" accept="image/*">
@@ -575,15 +660,15 @@
                 <textarea id="admin-announce-text" rows="2" placeholder="Текст объявления..."></textarea>
                 <div style="display:flex; gap:10px;">
                     <button class="btn-primary" onclick="saveAnnouncement()">Опубликовать</button>
-                    <button class="btn-primary" style="background: #333;" onclick="clearAnnouncement()">Убрать</button>
+                    <button class="btn-primary" style="background: rgba(255,255,255,0.1); box-shadow:none;" onclick="clearAnnouncement()">Убрать</button>
                 </div>
 
                 <h3 style="color:#fff; font-size: 0.9rem; margin-top: 20px;">🔔 Массовое уведомление (Alert)</h3>
                 <input type="text" id="admin-alert-text" placeholder="Текст короткого уведомления всем...">
-                <button class="btn-primary" style="background: var(--accent-blue);" onclick="sendGlobalAlert()">Отправить всплывашку</button>
+                <button class="btn-primary" style="background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); box-shadow: 0 4px 14px rgba(59, 130, 246, 0.35);" onclick="sendGlobalAlert()">Отправить всплывашку</button>
 
                 <h3 style="color:#fff; font-size: 0.9rem; margin-top: 25px;">👥 Управление пользователями</h3>
-                <input type="text" id="user-search-input" placeholder="🔍 Поиск по нику..." style="margin-top:5px; margin-bottom:5px;" oninput="filterUsersTable()">
+                <input type="text" id="user-search-input" placeholder="🔍 Поиск по нику..." style="margin-top:5px; margin-bottom:10px;" oninput="filterUsersTable()">
 
                 <div class="table-responsive">
                     <table class="admin-users-list">
@@ -602,8 +687,8 @@
 
                 <h3 style="color:#fff; font-size: 0.9rem; margin-top: 25px;">🛠️ Плюшки & Безопасность</h3>
                 <div style="display:flex; flex-direction:column; gap:8px;">
-                    <button class="btn-primary" id="maintenance-btn" style="background: var(--accent-gold); color:#000;" onclick="toggleMaintenance()">🛠️ Включить Режим Тех. Работ</button>
-                    <button class="btn-primary" style="background: #a81c1c;" onclick="removeAllGames()">🔥 Удалить ВСЕ игры с сайта</button>
+                    <button class="btn-primary" id="maintenance-btn" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color:#000; box-shadow: 0 4px 14px rgba(245, 158, 11, 0.35);" onclick="toggleMaintenance()">🛠️ Включить Режим Тех. Работ</button>
+                    <button class="btn-primary" style="background: #a81c1c; box-shadow:none;" onclick="removeAllGames()">🔥 Удалить ВСЕ игры с сайта</button>
                 </div>
             </div>
         </section>
@@ -733,8 +818,7 @@
         function loadUserProfile(uid, defaultName) {
             db.ref('users/' + uid).on('value', (snapshot) => {
                 const data = snapshot.val();
-                
-                if (!data) return; // Если юзер был удалён из базы
+                if (!data) return;
 
                 if (data.isBanned) {
                     document.getElementById('banned-overlay').style.display = 'flex';
@@ -907,7 +991,6 @@
             });
         }
 
-        /* --- ФУНКЦИИ И ПЛЮШКИ АДМИНКИ --- */
         function loadAdminStats() {
             db.ref('users').on('value', snap => {
                 document.getElementById('stat-users').innerText = snap.numChildren() || 0;
@@ -965,7 +1048,7 @@
                         <button class="btn-action-small btn-action-gold" onclick="toggleDevBadge('${targetUid}', ${!isDev})">${isDev ? 'Снять 👑' : '👑'}</button>
                         <button class="btn-action-small" onclick="toggleMute('${targetUid}', ${!isMuted})">${isMuted ? 'Анмут' : 'Мут'}</button>
                         <button class="btn-action-small btn-action-danger" onclick="toggleBan('${targetUid}', ${!isBanned})">${isBanned ? 'Разбан' : 'Бан'}</button>
-                        <button class="btn-action-small btn-action-danger" style="background:#4a0000;" onclick="deleteUserAccount('${targetUid}')">❌ Удалить</button>
+                        <button class="btn-action-small btn-action-danger" style="background:rgba(255,59,92,0.2);" onclick="deleteUserAccount('${targetUid}')">❌ Удалить</button>
                     </td>
                 `;
                 tbody.appendChild(tr);
@@ -974,7 +1057,6 @@
 
         function filterUsersTable() { renderUsersTable(); }
 
-        /* --- МОДАЛЬНОЕ ОКНО ПРОФИЛЯ --- */
         function openUserModal(uid) {
             selectedModalUid = uid;
             const u = allUsersData[uid];
@@ -999,7 +1081,6 @@
             Object.values(allGamesData).forEach(g => { if (g.authorUid === uid) userGamesCount++; });
             document.getElementById('modal-user-games-count').innerText = userGamesCount;
 
-            // Кнопки действия
             document.getElementById('modal-btn-verify').innerText = u.isVerified ? 'Снять ☑️' : 'Дать ☑️';
             document.getElementById('modal-btn-dev').innerText = u.isDevBadge ? 'Снять 👑 DEV' : 'Дать 👑 DEV';
             document.getElementById('modal-btn-admin').innerText = u.isAdmin ? 'Снять ADMIN' : 'Дать ADMIN';
@@ -1021,18 +1102,15 @@
         function modalToggleBan() { if (selectedModalUid) toggleBan(selectedModalUid, !allUsersData[selectedModalUid].isBanned); }
         function adminDeleteUserAccount() { if (selectedModalUid) deleteUserAccount(selectedModalUid); }
 
-        /* --- ПОЛНОЕ УДАЛЕНИЕ АККАУНТА --- */
         function deleteUserAccount(uid) {
             const userName = allUsersData[uid] ? allUsersData[uid].username : 'пользователя';
             if (confirm(`Вы уверены, что хотите НАВСЕГДА удалить аккаунт "${userName}" и все его опубликованные игры?`)) {
-                // 1. Удаляем все игры пользователя
                 Object.entries(allGamesData).forEach(([gId, gObj]) => {
                     if (gObj.authorUid === uid) {
                         db.ref('games/' + gId).remove();
                     }
                 });
 
-                // 2. Удаляем запись пользователя из базы
                 db.ref('users/' + uid).remove().then(() => {
                     alert(`Аккаунт ${userName} успешно удален!`);
                     closeUserModal();
