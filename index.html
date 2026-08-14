@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Strawberry Squad Hub 🍓</title>
+    <style>
+        :root {
+            --bg-color: #0f0a12;
+            --card-bg: #1a0f24;
+            --accent-pink: #ff2a75;
+            --accent-green: #00ff88;
+            --accent-purple: #8b00ff;
+            --text-color: #ffffff;
+            --sub-text: #b3a5c4;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        header {
+            width: 100%;
+            background: linear-gradient(135deg, #2b0836, #12051c);
+            padding: 15px 0;
+            text-align: center;
+            border-bottom: 3px solid var(--accent-pink);
+            box-shadow: 0 0 25px rgba(255, 42, 117, 0.4);
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 1.8rem;
+            color: var(--accent-pink);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 0 0 10px var(--accent-pink);
+        }
+
+        .container {
+            width: 90%;
+            max-width: 500px;
+            margin: 30px auto;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 25px;
+            border: 2px solid rgba(255, 42, 117, 0.2);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.7);
+        }
+
+        .tab-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 10px;
+            background: #281438;
+            border: 1px solid var(--accent-pink);
+            color: #fff;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .tab-btn.active {
+            background: var(--accent-pink);
+            box-shadow: 0 0 12px var(--accent-pink);
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 12px;
+            border-radius: 8px;
+            border: 1px solid #3d1e56;
+            background: #0d0614;
+            color: #fff;
+            box-sizing: border-box;
+            outline: none;
+        }
+
+        input:focus {
+            border-color: var(--accent-pink);
+            box-shadow: 0 0 8px var(--accent-pink);
+        }
+
+        button.action-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(90deg, var(--accent-pink), var(--accent-purple));
+            color: #fff;
+            border: none;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: 0.2s;
+            text-transform: uppercase;
+        }
+
+        button.action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 15px var(--accent-pink);
+        }
+
+        #app-screen { display: none; }
+
+        .user-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #251236;
+            padding: 10px 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            border-left: 4px solid var(--accent-green);
+        }
+
+        #messages {
+            height: 300px;
+            overflow-y: auto;
+            border: 1px solid #3d1e56;
+            padding: 10px;
+            margin-bottom: 12px;
+            border-radius: 10px;
+            background: #0d0614;
+        }
+
+        .msg { margin-bottom: 10px; line-height: 1.4; }
+        .msg-user { color: var(--accent-pink); font-weight: bold; }
+        .logout-btn {
+            background: transparent;
+            border: 1px solid #ff4444;
+            color: #ff4444;
+            padding: 5px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>🍓 Strawberry Squad 🍓</h1>
+    </header>
+
+    <div class="container">
+        <!-- Блок Входа / Регистрации -->
+        <div id="auth-screen" class="card">
+            <div class="tab-buttons">
+                <button id="tab-login" class="tab-btn active" onclick="switchTab('login')">Вход</button>
+                <button id="tab-register" class="tab-btn" onclick="switchTab('register')">Регистрация</button>
+            </div>
+
+            <!-- Форма Входа -->
+            <div id="form-login">
+                <input type="email" id="login-email" placeholder="Твой Email...">
+                <input type="password" id="login-password" placeholder="Пароль...">
+                <button class="action-btn" onclick="handleLogin()">Войти в Клубнику</button>
+            </div>
+
+            <!-- Форма Регистрации -->
+            <div id="form-register" style="display: none;">
+                <input type="text" id="reg-username" placeholder="Твой Игровой Ник...">
+                <input type="email" id="reg-email" placeholder="Email...">
+                <input type="password" id="reg-password" placeholder="Пароль (мин. 6 символов)...">
+                <button class="action-btn" onclick="handleRegister()">Создать Аккаунт</button>
+            </div>
+        </div>
+
+        <!-- Основной экран (Чат) -->
+        <div id="app-screen" class="card">
+            <div class="user-info">
+                <span>Игрок: <strong id="display-name" style="color: var(--accent-green);">...</strong></span>
+                <button class="logout-btn" onclick="handleLogout()">Выйти</button>
+            </div>
+
+            <h2>💬 Чат Клубники</h2>
+            <div id="messages"></div>
+
+            <input type="text" id="message-input" placeholder="Написать сообщение в сквад..." onkeydown="if(event.key==='Enter') sendMessage()">
+            <button class="action-btn" onclick="sendMessage()">Отправить 🍓</button>
+        </div>
+    </div>
+
+    <!-- Подключаем Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+    <script>
+        // Твои настройки Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyAG7dEtpPt6oHoMz5MlFR6aNR7phK95MWk",
+            authDomain: "sayt-dlya-druzey.firebaseapp.com",
+            databaseURL: "https://sayt-dlya-druzey-default-rtdb.firebaseio.com",
+            projectId: "sayt-dlya-druzey",
+            storageBucket: "sayt-dlya-druzey.firebasestorage.app",
+            messagingSenderId: "498949269925",
+            appId: "1:498949269925:web:9f58b3d957921b3cd6e04c",
+            measurementId: "G-L8F5K30H3C"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.database();
+
+        // Переключение вкладок
+        function switchTab(type) {
+            if (type === 'login') {
+                document.getElementById('form-login').style.display = 'block';
+                document.getElementById('form-register').style.display = 'none';
+                document.getElementById('tab-login').classList.add('active');
+                document.getElementById('tab-register').classList.remove('active');
+            } else {
+                document.getElementById('form-login').style.display = 'none';
+                document.getElementById('form-register').style.display = 'block';
+                document.getElementById('tab-register').classList.add('active');
+                document.getElementById('tab-login').classList.remove('active');
+            }
+        }
+
+        // Проверка авторизации
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                document.getElementById('auth-screen').style.display = 'none';
+                document.getElementById('app-screen').style.display = 'block';
+                document.getElementById('display-name').innerText = user.displayName || user.email.split('@')[0];
+                listenMessages();
+            } else {
+                document.getElementById('auth-screen').style.display = 'block';
+                document.getElementById('app-screen').style.display = 'none';
+            }
+        });
+
+        // Регистрация
+        function handleRegister() {
+            const nick = document.getElementById('reg-username').value.trim();
+            const email = document.getElementById('reg-email').value.trim();
+            const pass = document.getElementById('reg-password').value;
+
+            if (!nick || !email || !pass) return alert("Заполни все поля!");
+
+            auth.createUserWithEmailAndPassword(email, pass)
+                .then((userCredential) => {
+                    return userCredential.user.updateProfile({ displayName: nick });
+                })
+                .catch((error) => alert("Ошибка: " + error.message));
+        }
+
+        // Вход
+        function handleLogin() {
+            const email = document.getElementById('login-email').value.trim();
+            const pass = document.getElementById('login-password').value;
+
+            if (!email || !pass) return alert("Введи email и пароль!");
+
+            auth.signInWithEmailAndPassword(email, pass)
+                .catch((error) => alert("Ошибка входа: " + error.message));
+        }
+
+        // Выход
+        function handleLogout() {
+            auth.signOut();
+        }
+
+        // Отправка сообщений
+        function sendMessage() {
+            const input = document.getElementById('message-input');
+            const text = input.value.trim();
+            const user = auth.currentUser;
+
+            if (text && user) {
+                db.ref('messages').push({
+                    user: user.displayName || user.email.split('@')[0],
+                    text: text,
+                    timestamp: Date.now()
+                });
+                input.value = '';
+            }
+        }
+
+        // Чтение сообщений
+        function listenMessages() {
+            const msgBox = document.getElementById('messages');
+            msgBox.innerHTML = ''; // Очищаем при перезагрузке
+            db.ref('messages').limitToLast(50).on('child_added', (snapshot) => {
+                const data = snapshot.val();
+                const p = document.createElement('p');
+                p.className = 'msg';
+                p.innerHTML = `<span class="msg-user">${escapeHtml(data.user)}:</span> ${escapeHtml(data.text)}`;
+                msgBox.appendChild(p);
+                msgBox.scrollTop = msgBox.scrollHeight;
+            });
+        }
+
+        function escapeHtml(text) {
+            return text.replace(/[&<>"']/g, (m) => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'
+            }[m]));
+        }
+    </script>
+</body>
+</html>
