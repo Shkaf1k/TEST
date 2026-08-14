@@ -10,6 +10,7 @@
             --panel-bg: #1a1a1a;
             --card-bg: #1e1e1e;
             --accent-red: #ff3b3b;
+            --accent-blue: #3b82f6;
             --border-color: #2e2e2e;
             --text-main: #ffffff;
             --text-muted: #aaaaaa;
@@ -63,7 +64,6 @@
             background: #2a2a2a;
         }
 
-        /* Баннер глобального объявления */
         #global-announcement {
             background: rgba(255, 59, 59, 0.15);
             border-bottom: 1px solid var(--accent-red);
@@ -90,7 +90,6 @@
             color: #ffffff;
         }
 
-        /* Карточки игр */
         .games-grid {
             display: flex;
             flex-direction: column;
@@ -138,6 +137,10 @@
             font-size: 0.75rem; 
             color: #777; 
             margin-bottom: 12px; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
         }
 
         .card-actions {
@@ -169,7 +172,6 @@
 
         .btn-delete-link:hover { color: var(--accent-red); text-decoration: underline; }
 
-        /* Профиль */
         .profile-header {
             background: var(--panel-bg);
             border: 1px solid var(--border-color);
@@ -213,16 +215,20 @@
             border-radius: 3px;
             font-weight: bold;
             letter-spacing: 1px;
-            display: inline-block;
         }
 
-        /* Панели форм */
+        .verified-badge {
+            color: var(--accent-blue);
+            font-size: 0.95rem;
+            line-height: 1;
+        }
+
         .card-panel {
             background: var(--panel-bg);
             padding: 30px;
             border-radius: 6px;
             border: 1px solid var(--border-color);
-            max-width: 600px;
+            max-width: 750px;
             margin: 0 auto 20px auto;
         }
 
@@ -293,11 +299,53 @@
         .stat-value { font-size: 1.4rem; font-weight: bold; color: var(--accent-red); }
         .stat-label { font-size: 0.75rem; color: var(--text-muted); }
 
-        /* Модалка авторизации */
-        #auth-overlay {
+        /* Таблица админки */
+        .admin-users-list {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            font-size: 0.85rem;
+        }
+
+        .admin-users-list th, .admin-users-list td {
+            padding: 10px;
+            border-bottom: 1px solid var(--border-color);
+            text-align: left;
+        }
+
+        .admin-users-list th {
+            color: var(--text-muted);
+            font-weight: normal;
+        }
+
+        .user-row-avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            vertical-align: middle;
+            margin-right: 8px;
+            object-fit: cover;
+        }
+
+        .btn-action-small {
+            background: #252525;
+            border: 1px solid var(--border-color);
+            color: #fff;
+            padding: 4px 8px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            margin-right: 4px;
+        }
+
+        .btn-action-small:hover { background: #333; }
+        .btn-action-danger { color: #ff5555; border-color: #ff5555; }
+        .btn-action-blue { color: var(--accent-blue); border-color: var(--accent-blue); }
+
+        #auth-overlay, #banned-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.9);
+            background: rgba(0, 0, 0, 0.92);
             display: flex;
             justify-content: center;
             align-items: center;
@@ -340,6 +388,16 @@
 
     <div id="global-announcement">📢 <span id="announcement-text"></span></div>
 
+    <!-- Модалка бана -->
+    <div id="banned-overlay" style="display: none;">
+        <div class="auth-card" style="text-align: center;">
+            <h2 style="color: var(--accent-red); margin-top:0;">⛔ Вы заблокированы</h2>
+            <p style="color: var(--text-muted); font-size: 0.9rem;">Ваш аккаунт получил бан за нарушение правил.</p>
+            <button class="btn-primary" onclick="handleLogout()">Выйти</button>
+        </div>
+    </div>
+
+    <!-- Модалка входа -->
     <div id="auth-overlay">
         <div class="auth-card">
             <div class="tab-buttons">
@@ -400,6 +458,7 @@
                     <img src="https://via.placeholder.com/90" id="view-avatar" class="profile-avatar" alt="Avatar">
                     <h2 class="profile-name">
                         <span id="view-username">Никнейм</span>
+                        <span id="view-verified-badge" class="verified-badge" style="display: none;" title="Подтверждённый разработчик">☑️</span>
                         <span id="view-admin-badge" class="admin-badge" style="display: none;">ADMIN</span>
                     </h2>
                     <p class="profile-bio" id="view-bio">Описание профиля не заполнено.</p>
@@ -422,7 +481,7 @@
             </div>
         </section>
 
-        <!-- Вкладка 4: Секретная Админка -->
+        <!-- Вкладка 4: Админка -->
         <section id="section-admin" style="display: none;">
             <div class="card-panel">
                 <h2 class="section-title" style="margin-bottom: 20px;">⚙️ Панель Разработчика</h2>
@@ -438,10 +497,29 @@
                     </div>
                 </div>
 
-                <label>Глобальное объявление (для всех пользователей):</label>
-                <textarea id="admin-announce-text" rows="2" placeholder="Например: 'Технические работы 15 минут' или 'Приветствуем всех!'"></textarea>
-                <button class="btn-primary" style="margin-bottom: 15px;" onclick="saveAnnouncement()">Опубликовать объявление</button>
-                <button class="btn-primary" style="background: #333;" onclick="clearAnnouncement()">Убрать объявление</button>
+                <h3 style="color:#fff; font-size: 1rem; margin-top: 25px;">📢 Глобальное объявление</h3>
+                <textarea id="admin-announce-text" rows="2" placeholder="Текст объявления..."></textarea>
+                <div style="display:flex; gap:10px;">
+                    <button class="btn-primary" onclick="saveAnnouncement()">Опубликовать</button>
+                    <button class="btn-primary" style="background: #333;" onclick="clearAnnouncement()">Убрать</button>
+                </div>
+
+                <h3 style="color:#fff; font-size: 1rem; margin-top: 30px;">👥 Управление пользователями</h3>
+                <table class="admin-users-list">
+                    <thead>
+                        <tr>
+                            <th>Пользователь</th>
+                            <th>Статус</th>
+                            <th>Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody id="admin-users-table">
+                        <tr><td colspan="3" style="color:var(--text-muted)">Загрузка списка...</td></tr>
+                    </tbody>
+                </table>
+
+                <h3 style="color:#fff; font-size: 1rem; margin-top: 30px;">🛠️ Опасная зона (Плюшки)</h3>
+                <button class="btn-primary" style="background: #a81c1c;" onclick="removeAllGames()">🔥 Удалить ВСЕ игры с сайта</button>
             </div>
         </section>
     </main>
@@ -470,6 +548,8 @@
         let currentAvatarBase64 = '';
         let currentBannerBase64 = '';
         let isAdminUser = false;
+        let isMutedUser = false;
+        let isVerifiedMap = {}; 
 
         function switchAuthTab(type) {
             if (type === 'login') {
@@ -506,6 +586,7 @@
                 listenAnnouncement();
             } else {
                 document.getElementById('auth-overlay').style.display = 'flex';
+                document.getElementById('banned-overlay').style.display = 'none';
                 document.getElementById('nav-tabs').style.display = 'none';
             }
         });
@@ -527,7 +608,10 @@
                         avatar: '',
                         banner: '',
                         bio: 'Разработчик на Godot Engine 🎮',
-                        isAdmin: isDev
+                        isAdmin: isDev,
+                        isVerified: isDev,
+                        isBanned: false,
+                        isMuted: false
                     });
                 })
                 .catch(err => alert("Ошибка: " + err.message));
@@ -556,20 +640,34 @@
         function loadUserProfile(uid, defaultName) {
             db.ref('users/' + uid).on('value', (snapshot) => {
                 const data = snapshot.val() || {};
+                
+                // Проверка на БАН
+                if (data.isBanned) {
+                    document.getElementById('banned-overlay').style.display = 'flex';
+                    return;
+                } else {
+                    document.getElementById('banned-overlay').style.display = 'none';
+                }
+
+                isMutedUser = !!data.isMuted;
+
                 const name = data.username || defaultName || 'Dev';
                 document.getElementById('view-username').innerText = name;
                 document.getElementById('view-bio').innerText = data.bio || 'Нет описания.';
                 
-                // АВТОМАТИЧЕСКАЯ ПРОВЕРКА НА АДМИНА ПО НИКУ ИЛИ ФЛАГУ
+                // Значок верификации
+                document.getElementById('view-verified-badge').style.display = data.isVerified ? 'inline' : 'none';
+
+                // Автоматическая проверка Админа
                 if (name.toLowerCase().includes('shkaf1k') || data.isAdmin) {
                     isAdminUser = true;
                     document.getElementById('admin-tab-btn').style.display = 'inline-block';
                     document.getElementById('view-admin-badge').style.display = 'inline-block';
                     loadAdminStats();
+                    loadAdminUsersTable();
                     
-                    // Обновляем флаг в БД на будущее
                     if (!data.isAdmin) {
-                        db.ref('users/' + uid).update({ isAdmin: true });
+                        db.ref('users/' + uid).update({ isAdmin: true, isVerified: true });
                     }
                 }
 
@@ -609,6 +707,8 @@
         }
 
         async function publishGame() {
+            if (isMutedUser) return alert("Ваш аккаунт замучен! Вы не можете публиковать игры.");
+
             const user = auth.currentUser;
             if (!user) return;
 
@@ -652,8 +752,6 @@
             if (confirm("Вы действительно хотите удалить эту игру?")) {
                 db.ref('games/' + gameId).remove().then(() => {
                     alert("Игра успешно удалена!");
-                }).catch((err) => {
-                    alert("Ошибка при удалении: " + err.message);
                 });
             }
         }
@@ -662,43 +760,52 @@
             const container = document.getElementById('games-container');
             const currentUser = auth.currentUser;
 
-            db.ref('games').on('value', (snapshot) => {
-                container.innerHTML = '';
-                const games = snapshot.val();
-                
-                if (!games) {
-                    container.innerHTML = '<p style="color: var(--text-muted);">Пока нет игр. Будь первым!</p>';
-                    return;
-                }
+            // Сначала загружаем данные верификации
+            db.ref('users').on('value', (uSnap) => {
+                const uData = uSnap.val() || {};
+                isVerifiedMap = {};
+                Object.entries(uData).forEach(([uUid, uObj]) => {
+                    isVerifiedMap[uUid] = !!uObj.isVerified;
+                });
 
-                Object.entries(games).reverse().forEach(([gameId, game]) => {
-                    const card = document.createElement('div');
-                    card.className = 'game-card';
+                db.ref('games').on('value', (snapshot) => {
+                    container.innerHTML = '';
+                    const games = snapshot.val();
                     
-                    const coverHtml = game.cover ? `<img src="${escapeHtml(game.cover)}" class="game-cover" alt="Cover">` : '';
-                    
-                    // Кнопка удаления доступна АВТОРУ или АДМИНУ
-                    const canDelete = (currentUser && currentUser.uid === game.authorUid) || isAdminUser;
-                    const deleteBtnHtml = canDelete 
-                        ? `<button class="btn-delete-link" onclick="deleteGame('${gameId}')">${isAdminUser && currentUser.uid !== game.authorUid ? '[Админ Удалить]' : 'Удалить'}</button>` 
-                        : '';
+                    if (!games) {
+                        container.innerHTML = '<p style="color: var(--text-muted);">Пока нет игр. Будь первым!</p>';
+                        return;
+                    }
 
-                    card.innerHTML = `
-                        ${coverHtml}
-                        <h3 class="game-title">${escapeHtml(game.title)}</h3>
-                        <div class="game-author">Автор: ${escapeHtml(game.author)}</div>
-                        <p class="game-desc">${escapeHtml(game.desc)}</p>
-                        <div class="card-actions">
-                            <a href="${escapeHtml(game.download)}" download="${escapeHtml(game.fileName || 'game')}" class="btn-download-link">Играть / Скачать</a>
-                            ${deleteBtnHtml}
-                        </div>
-                    `;
-                    container.appendChild(card);
+                    Object.entries(games).reverse().forEach(([gameId, game]) => {
+                        const card = document.createElement('div');
+                        card.className = 'game-card';
+                        
+                        const coverHtml = game.cover ? `<img src="${escapeHtml(game.cover)}" class="game-cover" alt="Cover">` : '';
+                        const isAuthorVerified = isVerifiedMap[game.authorUid] ? '<span class="verified-badge" title="Подтверждён">☑️</span>' : '';
+
+                        const canDelete = (currentUser && currentUser.uid === game.authorUid) || isAdminUser;
+                        const deleteBtnHtml = canDelete 
+                            ? `<button class="btn-delete-link" onclick="deleteGame('${gameId}')">${isAdminUser && currentUser.uid !== game.authorUid ? '[Админ Удалить]' : 'Удалить'}</button>` 
+                            : '';
+
+                        card.innerHTML = `
+                            ${coverHtml}
+                            <h3 class="game-title">${escapeHtml(game.title)}</h3>
+                            <div class="game-author">Автор: ${escapeHtml(game.author)} ${isAuthorVerified}</div>
+                            <p class="game-desc">${escapeHtml(game.desc)}</p>
+                            <div class="card-actions">
+                                <a href="${escapeHtml(game.download)}" download="${escapeHtml(game.fileName || 'game')}" class="btn-download-link">Играть / Скачать</a>
+                                ${deleteBtnHtml}
+                            </div>
+                        `;
+                        container.appendChild(card);
+                    });
                 });
             });
         }
 
-        /* --- ФУНКЦИИ АДМИНКИ --- */
+        /* --- ФУНКЦИИ И ПЛЮШКИ АДМИНКИ --- */
         function loadAdminStats() {
             db.ref('users').on('value', snap => {
                 document.getElementById('stat-users').innerText = snap.numChildren() || 0;
@@ -706,6 +813,60 @@
             db.ref('games').on('value', snap => {
                 document.getElementById('stat-games').innerText = snap.numChildren() || 0;
             });
+        }
+
+        function loadAdminUsersTable() {
+            db.ref('users').on('value', snap => {
+                const tbody = document.getElementById('admin-users-table');
+                tbody.innerHTML = '';
+                const users = snap.val() || {};
+
+                Object.entries(users).forEach(([targetUid, targetUser]) => {
+                    const tr = document.createElement('tr');
+                    const avatarSrc = targetUser.avatar || 'https://via.placeholder.com/28';
+                    const isBanned = !!targetUser.isBanned;
+                    const isMuted = !!targetUser.isMuted;
+                    const isVerified = !!targetUser.isVerified;
+
+                    let statusBadges = [];
+                    if (isBanned) statusBadges.push('<span style="color:red">БАН</span>');
+                    if (isMuted) statusBadges.push('<span style="color:orange">МУТ</span>');
+                    if (isVerified) statusBadges.push('<span style="color:var(--accent-blue)">☑️</span>');
+                    if (statusBadges.length === 0) statusBadges.push('<span style="color:gray">Обычный</span>');
+
+                    tr.innerHTML = `
+                        <td>
+                            <img src="${escapeHtml(avatarSrc)}" class="user-row-avatar">
+                            <b>${escapeHtml(targetUser.username || 'Пользователь')}</b>
+                        </td>
+                        <td>${statusBadges.join(' ')}</td>
+                        <td>
+                            <button class="btn-action-small btn-action-blue" onclick="toggleVerify('${targetUid}', ${!isVerified})">${isVerified ? 'Снять ☑️' : 'Дать ☑️'}</button>
+                            <button class="btn-action-small" onclick="toggleMute('${targetUid}', ${!isMuted})">${isMuted ? 'Анмут' : 'Мут'}</button>
+                            <button class="btn-action-small btn-action-danger" onclick="toggleBan('${targetUid}', ${!isBanned})">${isBanned ? 'Разбан' : 'Бан'}</button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            });
+        }
+
+        function toggleVerify(uid, status) {
+            db.ref('users/' + uid).update({ isVerified: status });
+        }
+
+        function toggleMute(uid, status) {
+            db.ref('users/' + uid).update({ isMuted: status });
+        }
+
+        function toggleBan(uid, status) {
+            db.ref('users/' + uid).update({ isBanned: status });
+        }
+
+        function removeAllGames() {
+            if (confirm("ВНИМАНИЕ! Это действие удалит абсолютно ВСЕ опубликованные игры на сайте! Продолжить?")) {
+                db.ref('games').remove().then(() => alert("Все игры очищены!"));
+            }
         }
 
         function saveAnnouncement() {
