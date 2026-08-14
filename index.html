@@ -1,1270 +1,791 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Godot Dev Hub</title>
-    <style>
-        :root {
-            --bg-dark: #0a0b0e;
-            --panel-bg: rgba(18, 20, 29, 0.75);
-            --card-bg: rgba(24, 27, 38, 0.7);
-            --card-border: rgba(255, 255, 255, 0.08);
-            --accent-red: #ff3b5c;
-            --accent-red-glow: rgba(255, 59, 92, 0.35);
-            --accent-blue: #3b82f6;
-            --accent-gold: #f59e0b;
-            --accent-purple: #8b5cf6;
-            --accent-green: #10b981;
-            --text-main: #f3f4f6;
-            --text-muted: #9ca3af;
-        }
-
-        * { box-sizing: border-box; }
-
-        body {
-            background-color: var(--bg-dark);
-            background-image: 
-                radial-gradient(at 15% 15%, rgba(255, 59, 92, 0.08) 0px, transparent 45%),
-                radial-gradient(at 85% 85%, rgba(59, 130, 246, 0.08) 0px, transparent 45%);
-            background-attachment: fixed;
-            color: var(--text-main);
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            margin: 0;
-            padding: 0;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            overflow-x: hidden;
-        }
-
-        /* --- TOAST NOTIFICATIONS --- */
-        #toast-container {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            z-index: 1000;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            pointer-events: none;
-        }
-
-        .toast {
-            pointer-events: auto;
-            background: rgba(24, 27, 38, 0.95);
-            backdrop-filter: blur(12px);
-            border: 1px solid var(--card-border);
-            color: #fff;
-            padding: 12px 18px;
-            border-radius: 10px;
-            font-size: 0.88rem;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            animation: toastIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-            max-width: 320px;
-        }
-
-        .toast.success { border-left: 4px solid var(--accent-green); }
-        .toast.error { border-left: 4px solid var(--accent-red); }
-        .toast.info { border-left: 4px solid var(--accent-blue); }
-
-        @keyframes toastIn {
-            from { transform: translateY(20px) scale(0.9); opacity: 0; }
-            to { transform: translateY(0) scale(1); opacity: 1; }
-        }
-
-        /* --- HEADER --- */
-        header {
-            min-height: 65px;
-            background: var(--panel-bg);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border-bottom: 1px solid var(--card-border);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 10px 24px;
-            flex-wrap: wrap;
-            gap: 12px;
-            position: sticky;
-            top: 0;
-            z-index: 50;
-        }
-
-        .logo { 
-            font-size: 1.15rem; 
-            font-weight: 800; 
-            letter-spacing: 1.5px; 
-            color: #fff;
-            text-shadow: 0 0 12px var(--accent-red-glow);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            cursor: pointer;
-        }
-
-        .nav-tabs { display: flex; gap: 8px; flex-wrap: wrap; }
-
-        .nav-btn {
-            background: transparent;
-            border: 1px solid transparent;
-            color: var(--text-muted);
-            padding: 8px 14px;
-            border-radius: 8px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-            white-space: nowrap;
-        }
-
-        .nav-btn:hover { 
-            color: #fff; 
-            background: rgba(255, 255, 255, 0.05); 
-        }
-
-        .nav-btn.active { 
-            color: #fff; 
-            background: rgba(255, 59, 92, 0.15);
-            border-color: rgba(255, 59, 92, 0.4);
-            box-shadow: 0 0 14px var(--accent-red-glow);
-        }
-
-        #global-announcement {
-            background: linear-gradient(90deg, rgba(255, 59, 92, 0.25), rgba(139, 92, 246, 0.25));
-            backdrop-filter: blur(8px);
-            border-bottom: 1px solid rgba(255, 59, 92, 0.3);
-            color: #fff;
-            text-align: center;
-            padding: 10px 15px;
-            font-size: 0.85rem;
-            font-weight: 500;
-            display: none;
-            word-break: break-word;
-        }
-
-        main {
-            flex: 1;
-            max-width: 920px;
-            width: 100%;
-            margin: 25px auto;
-            padding: 0 16px;
-        }
-
-        .section-title {
-            text-align: center;
-            font-size: 1.25rem;
-            font-weight: 800;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            margin-bottom: 20px;
-            color: #ffffff;
-            background: linear-gradient(180deg, #ffffff 0%, #9ca3af 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        /* --- SEARCH & FILTERS --- */
-        .search-bar-container {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-            width: 100%;
-            max-width: 540px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        .search-bar-container input {
-            margin-bottom: 0 !important;
-        }
-
-        /* --- SKELETON LOADER --- */
-        .skeleton-card {
-            background: var(--card-bg);
-            border: 1px solid var(--card-border);
-            border-radius: 12px;
-            width: 100%;
-            max-width: 520px;
-            height: 320px;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .skeleton-card::after {
-            content: "";
-            position: absolute;
-            top: 0; right: 0; bottom: 0; left: 0;
-            transform: translateX(-100%);
-            background-image: linear-gradient(90deg, rgba(255,255,255,0) 0, rgba(255,255,255,0.05) 20%, rgba(255,255,255,0.05) 60%, rgba(255,255,255,0));
-            animation: shimmer 1.5s infinite;
-        }
-
-        @keyframes shimmer { 100% { transform: translateX(100%); } }
-
-        .skeleton-box { background: rgba(255,255,255,0.06); border-radius: 6px; }
-
-        /* --- GAME CARDS --- */
-        .games-grid { display: flex; flex-direction: column; gap: 20px; align-items: center; width: 100%; }
-
-        .game-card {
-            background: var(--card-bg);
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--card-border);
-            border-radius: 14px;
-            width: 100%;
-            max-width: 520px;
-            padding: 20px;
-            text-align: center;
-            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s, box-shadow 0.3s;
-            position: relative;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            animation: cardFadeIn 0.4s ease forwards;
-        }
-
-        @keyframes cardFadeIn {
-            from { opacity: 0; transform: translateY(15px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .game-card:hover { 
-            border-color: rgba(255, 255, 255, 0.25); 
-            transform: translateY(-4px);
-            box-shadow: 0 16px 36px rgba(0,0,0,0.45);
-        }
-
-        .game-cover-wrapper {
-            position: relative;
-            width: 100%;
-            max-height: 240px;
-            border-radius: 10px;
-            overflow: hidden;
-            margin-bottom: 16px;
-            border: 1px solid var(--card-border);
-        }
-
-        .game-cover {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-            transition: transform 0.5s ease;
-        }
-
-        .game-card:hover .game-cover {
-            transform: scale(1.03);
-        }
-
-        .game-title { font-size: 1.25rem; font-weight: 700; margin: 0 0 8px 0; color: #ffffff; word-break: break-word; }
-        .game-desc { color: var(--text-muted); font-size: 0.88rem; line-height: 1.5; margin-bottom: 16px; word-break: break-word; }
-
-        .game-author { 
-            font-size: 0.8rem; 
-            color: #999; 
-            margin-bottom: 14px; 
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            flex-wrap: wrap;
-        }
-
-        .card-actions { display: flex; justify-content: center; align-items: center; gap: 12px; flex-wrap: wrap; }
-
-        a.btn-download-link {
-            background: linear-gradient(135deg, var(--accent-red) 0%, #d92644 100%);
-            color: #fff;
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-size: 0.85rem;
-            font-weight: 700;
-            text-decoration: none;
-            transition: all 0.25s ease;
-            box-shadow: 0 4px 14px var(--accent-red-glow);
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        a.btn-download-link:hover { 
-            transform: scale(1.03); 
-            box-shadow: 0 6px 20px var(--accent-red-glow);
-        }
-
-        .btn-delete-link {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--card-border);
-            color: var(--text-muted);
-            font-size: 0.8rem;
-            padding: 9px 14px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .btn-delete-link:hover { color: var(--accent-red); border-color: rgba(255, 59, 92, 0.4); background: rgba(255, 59, 92, 0.1); }
-
-        /* --- PROFILES & PANELS --- */
-        .profile-header {
-            background: var(--card-bg);
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--card-border);
-            border-radius: 14px;
-            overflow: hidden;
-            margin-bottom: 20px;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
-        }
-
-        .profile-banner { height: 130px; background: #161822; background-size: cover; background-position: center; }
-
-        .profile-info { padding: 16px; position: relative; }
-
-        .profile-avatar {
-            width: 84px;
-            height: 84px;
-            border-radius: 50%;
-            border: 3px solid #16181f;
-            background: #20232c;
-            position: absolute;
-            top: -42px;
-            left: 16px;
-            object-fit: cover;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-        }
-
-        .profile-details { margin-left: 98px; }
-
-        .profile-name { font-size: 1.2rem; font-weight: 700; margin: 0; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; word-break: break-word; }
-        .profile-bio { color: var(--text-muted); margin: 6px 0 0 0; font-size: 0.85rem; line-height: 1.4; word-break: break-word; }
-
-        .admin-badge { background: var(--accent-red); color: #fff; font-size: 0.65rem; padding: 2px 7px; border-radius: 4px; font-weight: 800; }
-        .verified-badge { color: var(--accent-blue); font-size: 0.95rem; line-height: 1; }
-        .dev-badge { background: var(--accent-gold); color: #000; font-size: 0.65rem; padding: 2px 7px; border-radius: 4px; font-weight: 800; }
-
-        .card-panel {
-            background: var(--card-bg);
-            backdrop-filter: blur(10px);
-            padding: 22px 18px;
-            border-radius: 14px;
-            border: 1px solid var(--card-border);
-            max-width: 750px;
-            margin: 0 auto 20px auto;
-            width: 100%;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
-        }
-
-        label { display: block; color: var(--text-muted); font-size: 0.82rem; font-weight: 600; margin-bottom: 8px; }
-
-        input[type="text"], input[type="email"], input[type="password"], textarea {
-            width: 100%;
-            padding: 11px 14px;
-            margin-bottom: 16px;
-            border-radius: 8px;
-            border: 1px solid var(--card-border);
-            background: rgba(13, 14, 18, 0.6);
-            color: #fff;
-            outline: none;
-            font-family: inherit;
-            font-size: 0.9rem;
-            transition: border-color 0.2s, box-shadow 0.2s;
-        }
-
-        input[type="text"]:focus, input[type="email"]:focus, input[type="password"]:focus, textarea:focus {
-            border-color: rgba(255, 59, 92, 0.5);
-            box-shadow: 0 0 10px var(--accent-red-glow);
-        }
-
-        input[type="file"] {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 16px;
-            border-radius: 8px;
-            border: 1px dashed rgba(255, 255, 255, 0.2);
-            background: rgba(13, 14, 18, 0.4);
-            color: var(--text-muted);
-            cursor: pointer;
-            font-size: 0.82rem;
-        }
-
-        button.btn-primary {
-            width: 100%;
-            padding: 12px;
-            background: linear-gradient(135deg, var(--accent-red) 0%, #d92644 100%);
-            color: #fff;
-            border: none;
-            font-weight: 700;
-            font-size: 0.85rem;
-            cursor: pointer;
-            border-radius: 8px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            transition: all 0.25s ease;
-            box-shadow: 0 4px 14px var(--accent-red-glow);
-        }
-
-        button.btn-primary:hover { 
-            transform: translateY(-1px);
-            box-shadow: 0 6px 18px var(--accent-red-glow);
-        }
-
-        .stat-box {
-            display: flex;
-            justify-content: space-around;
-            background: rgba(13, 14, 18, 0.6);
-            padding: 14px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            border: 1px solid var(--card-border);
-        }
-
-        .stat-item { text-align: center; }
-        .stat-value { font-size: 1.3rem; font-weight: 800; color: var(--accent-red); }
-        .stat-label { font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
-
-        .table-responsive {
-            width: 100%;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-            margin-top: 10px;
-            border-radius: 8px;
-            border: 1px solid var(--card-border);
-        }
-
-        .admin-users-list {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.82rem;
-            min-width: 520px;
-            background: rgba(13, 14, 18, 0.4);
-        }
-
-        .admin-users-list th, .admin-users-list td {
-            padding: 10px 12px;
-            border-bottom: 1px solid var(--card-border);
-            text-align: left;
-        }
-
-        .admin-users-list th { color: var(--text-muted); font-weight: 600; background: rgba(255, 255, 255, 0.03); }
-
-        .user-clickable {
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            transition: opacity 0.2s;
-        }
-
-        .user-clickable:hover { opacity: 0.8; }
-
-        .user-row-avatar {
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            vertical-align: middle;
-            margin-right: 8px;
-            object-fit: cover;
-        }
-
-        .btn-action-small {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--card-border);
-            color: #fff;
-            padding: 5px 8px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 0.72rem;
-            margin-right: 3px;
-            margin-bottom: 3px;
-            display: inline-block;
-            transition: all 0.2s;
-        }
-
-        .btn-action-small:hover { background: rgba(255, 255, 255, 0.15); }
-        .btn-action-danger { color: #ff5555; border-color: rgba(255, 85, 85, 0.3); }
-        .btn-action-blue { color: var(--accent-blue); border-color: rgba(59, 130, 246, 0.3); }
-        .btn-action-gold { color: var(--accent-gold); border-color: rgba(245, 158, 11, 0.3); }
-
-        /* MODALS */
-        #auth-overlay, #banned-overlay, #maintenance-overlay, #user-modal-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(5, 6, 8, 0.85);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 100;
-            padding: 16px;
-            animation: fadeIn 0.25s ease;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        .auth-card {
-            width: 100%;
-            max-width: 380px;
-            background: var(--panel-bg);
-            backdrop-filter: blur(16px);
-            padding: 24px;
-            border-radius: 14px;
-            border: 1px solid var(--card-border);
-            box-shadow: 0 16px 40px rgba(0,0,0,0.5);
-        }
-
-        .user-modal-card {
-            width: 100%;
-            max-width: 450px;
-            max-height: 90vh;
-            overflow-y: auto;
-            background: #14161d;
-            border-radius: 14px;
-            border: 1px solid var(--card-border);
-            position: relative;
-            box-shadow: 0 16px 40px rgba(0,0,0,0.6);
-        }
-
-        .modal-close-btn {
-            position: absolute;
-            top: 10px;
-            right: 12px;
-            background: rgba(0,0,0,0.6);
-            border: 1px solid var(--card-border);
-            color: #fff;
-            font-size: 1.1rem;
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            cursor: pointer;
-            z-index: 10;
-            transition: background 0.2s;
-        }
-
-        .modal-close-btn:hover { background: rgba(255, 59, 92, 0.4); }
-
-        .tab-buttons { display: flex; gap: 8px; margin-bottom: 18px; }
-        .tab-btn { 
-            flex: 1; padding: 10px; background: rgba(13, 14, 18, 0.6); 
-            border: 1px solid var(--card-border); color: var(--text-muted); 
-            border-radius: 8px; cursor: pointer; font-size: 0.85rem; font-weight: 600;
-            transition: all 0.2s;
-        }
-        .tab-btn.active { color: #fff; border-color: rgba(255, 59, 92, 0.4); background: rgba(255, 59, 92, 0.15); }
-
-        /* MOBILE RESPONSIVE */
-        @media (max-width: 600px) {
-            header { justify-content: center; padding: 10px 8px; }
-            .logo { width: 100%; text-align: center; justify-content: center; font-size: 1.05rem; }
-            .nav-tabs { width: 100%; justify-content: center; gap: 4px; }
-            .nav-btn { font-size: 0.78rem; padding: 6px 10px; }
-            .profile-avatar { width: 68px; height: 68px; top: -34px; left: 12px; }
-            .profile-details { margin-left: 80px; }
-            .profile-name { font-size: 1.05rem; }
-            .profile-bio { font-size: 0.8rem; }
-            .card-panel { padding: 16px 12px; }
-            #toast-container { left: 10px; right: 10px; bottom: 10px; }
-            .toast { max-width: 100%; }
-        }
-    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Godot Dev Hub</title>
+    <style>
+        :root {
+            --bg-dark: #0a0b0e;
+            --panel-bg: rgba(18, 20, 29, 0.75);
+            --card-bg: rgba(24, 27, 38, 0.7);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --accent-red: #ff3b5c;
+            --accent-red-glow: rgba(255, 59, 92, 0.35);
+            --accent-blue: #3b82f6;
+            --accent-gold: #f59e0b;
+            --accent-purple: #8b5cf6;
+            --accent-green: #10b981;
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            background-color: var(--bg-dark);
+            background-image: 
+                radial-gradient(at 15% 15%, rgba(255, 59, 92, 0.08) 0px, transparent 45%),
+                radial-gradient(at 85% 85%, rgba(59, 130, 246, 0.08) 0px, transparent 45%);
+            background-attachment: fixed;
+            color: var(--text-main);
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        /* --- TOAST NOTIFICATIONS --- */
+        #toast-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            pointer-events: none;
+        }
+
+        .toast {
+            pointer-events: auto;
+            background: rgba(24, 27, 38, 0.95);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--card-border);
+            color: #fff;
+            padding: 12px 18px;
+            border-radius: 10px;
+            font-size: 0.88rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: toastIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            max-width: 320px;
+        }
+
+        .toast.success { border-left: 4px solid var(--accent-green); }
+        .toast.error { border-left: 4px solid var(--accent-red); }
+        .toast.info { border-left: 4px solid var(--accent-blue); }
+
+        @keyframes toastIn {
+            from { transform: translateY(20px) scale(0.9); opacity: 0; }
+            to { transform: translateY(0) scale(1); opacity: 1; }
+        }
+
+        /* --- HEADER --- */
+        header {
+            min-height: 65px;
+            background: var(--panel-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--card-border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 24px;
+            flex-wrap: wrap;
+            gap: 12px;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        .logo { 
+            font-size: 1.15rem; 
+            font-weight: 800; 
+            letter-spacing: 1.5px; 
+            color: #fff;
+            text-shadow: 0 0 12px var(--accent-red-glow);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+
+        .nav-tabs { display: flex; gap: 8px; flex-wrap: wrap; }
+
+        .nav-btn {
+            background: transparent;
+            border: 1px solid transparent;
+            color: var(--text-muted);
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            white-space: nowrap;
+        }
+
+        .nav-btn:hover { 
+            color: #fff; 
+            background: rgba(255, 255, 255, 0.05); 
+        }
+
+        .nav-btn.active { 
+            color: #fff; 
+            background: rgba(255, 59, 92, 0.15);
+            border-color: rgba(255, 59, 92, 0.4);
+            box-shadow: 0 0 14px var(--accent-red-glow);
+        }
+
+        #global-announcement {
+            background: linear-gradient(90deg, rgba(255, 59, 92, 0.25), rgba(139, 92, 246, 0.25));
+            backdrop-filter: blur(8px);
+            border-bottom: 1px solid rgba(255, 59, 92, 0.3);
+            color: #fff;
+            text-align: center;
+            padding: 10px 15px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            display: none;
+            word-break: break-word;
+        }
+
+        main {
+            flex: 1;
+            max-width: 920px;
+            width: 100%;
+            margin: 25px auto;
+            padding: 0 16px;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 1.25rem;
+            font-weight: 800;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+            color: #ffffff;
+            background: linear-gradient(180deg, #ffffff 0%, #9ca3af 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* --- SEARCH & FILTERS --- */
+        .search-bar-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            width: 100%;
+            max-width: 540px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .search-bar-container input {
+            margin-bottom: 0 !important;
+        }
+
+        /* --- SKELETON LOADER --- */
+        .skeleton-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            width: 100%;
+            max-width: 520px;
+            height: 320px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .skeleton-card::after {
+            content: "";
+            position: absolute;
+            top: 0; right: 0; bottom: 0; left: 0;
+            transform: translateX(-100%);
+            background-image: linear-gradient(90deg, rgba(255,255,255,0) 0, rgba(255,255,255,0.05) 20%, rgba(255,255,255,0.05) 60%, rgba(255,255,255,0));
+            animation: shimmer 1.5s infinite;
+        }
+
+        @keyframes shimmer { 100% { transform: translateX(100%); } }
+
+        .skeleton-box { background: rgba(255,255,255,0.06); border-radius: 6px; }
+
+        /* --- GAME CARDS --- */
+        .games-grid { display: flex; flex-direction: column; gap: 20px; align-items: center; width: 100%; }
+
+        .game-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--card-border);
+            border-radius: 14px;
+            width: 100%;
+            max-width: 520px;
+            padding: 20px;
+            text-align: center;
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s, box-shadow 0.3s;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            animation: cardFadeIn 0.4s ease forwards;
+        }
+
+        @keyframes cardFadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .game-card:hover { 
+            border-color: rgba(255, 255, 255, 0.25); 
+            transform: translateY(-4px);
+            box-shadow: 0 16px 36px rgba(0,0,0,0.45);
+        }
+
+        .game-cover-wrapper {
+            position: relative;
+            width: 100%;
+            max-height: 240px;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 16px;
+            border: 1px solid var(--card-border);
+        }
+
+        .game-cover {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            transition: transform 0.5s ease;
+        }
+
+        .game-card:hover .game-cover {
+            transform: scale(1.03);
+        }
+
+        .game-title { font-size: 1.25rem; font-weight: 700; margin: 0 0 8px 0; color: #ffffff; word-break: break-word; }
+        .game-desc { color: var(--text-muted); font-size: 0.88rem; line-height: 1.5; margin-bottom: 16px; word-break: break-word; }
+
+        .game-author { 
+            font-size: 0.8rem; 
+            color: #999; 
+            margin-bottom: 14px; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .card-actions { display: flex; justify-content: center; align-items: center; gap: 12px; flex-wrap: wrap; }
+
+        a.btn-download-link {
+            background: linear-gradient(135deg, var(--accent-red) 0%, #d92644 100%);
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-decoration: none;
+            transition: all 0.25s ease;
+            box-shadow: 0 4px 14px var(--accent-red-glow);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        a.btn-download-link:hover { 
+            transform: scale(1.03); 
+            box-shadow: 0 6px 20px var(--accent-red-glow);
+        }
+
+        .btn-delete-link {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--card-border);
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            padding: 9px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-delete-link:hover { color: var(--accent-red); border-color: rgba(255, 59, 92, 0.4); background: rgba(255, 59, 92, 0.1); }
+
+        /* --- PROFILES & PANELS --- */
+        .profile-header {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--card-border);
+            border-radius: 14px;
+            overflow: hidden;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+        }
+
+        .profile-banner { height: 130px; background: #161822; background-size: cover; background-position: center; }
+
+        .profile-info { padding: 16px; position: relative; }
+
+        .profile-avatar {
+            width: 84px;
+            height: 84px;
+            border-radius: 50%;
+            border: 3px solid #16181f;
+            background: #20232c;
+            position: absolute;
+            top: -42px;
+            left: 16px;
+            object-fit: cover;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+        }
+
+        .profile-details { margin-left: 98px; }
+
+        .profile-name { font-size: 1.2rem; font-weight: 700; margin: 0; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; word-break: break-word; }
+        .profile-bio { color: var(--text-muted); margin: 6px 0 0 0; font-size: 0.85rem; line-height: 1.4; word-break: break-word; }
+
+        .admin-badge { background: var(--accent-red); color: #fff; font-size: 0.65rem; padding: 2px 7px; border-radius: 4px; font-weight: 800; }
+        .verified-badge { color: var(--accent-blue); font-size: 0.95rem; line-height: 1; }
+        .dev-badge { background: var(--accent-gold); color: #000; font-size: 0.65rem; padding: 2px 7px; border-radius: 4px; font-weight: 800; }
+
+        .card-panel {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            padding: 22px 18px;
+            border-radius: 14px;
+            border: 1px solid var(--card-border);
+            max-width: 750px;
+            margin: 0 auto 20px auto;
+            width: 100%;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+        }
+
+        label { display: block; color: var(--text-muted); font-size: 0.82rem; font-weight: 600; margin-bottom: 8px; }
+
+        input[type="text"], input[type="email"], input[type="password"], textarea {
+            width: 100%;
+            padding: 11px 14px;
+            margin-bottom: 16px;
+            border-radius: 8px;
+            border: 1px solid var(--card-border);
+            background: rgba(13, 14, 18, 0.6);
+            color: #fff;
+            outline: none;
+            font-family: inherit;
+            font-size: 0.9rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        input[type="text"]:focus, input[type="email"]:focus, input[type="password"]:focus, textarea:focus {
+            border-color: rgba(255, 59, 92, 0.5);
+            box-shadow: 0 0 10px var(--accent-red-glow);
+        }
+
+        input[type="file"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 16px;
+            border-radius: 8px;
+            border: 1px dashed rgba(255, 255, 255, 0.2);
+            background: rgba(13, 14, 18, 0.4);
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 0.82rem;
+        }
+
+        button.btn-primary {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, var(--accent-red) 0%, #d92644 100%);
+            color: #fff;
+            border: none;
+            font-weight: 700;
+            font-size: 0.85rem;
+            cursor: pointer;
+            border-radius: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.25s ease;
+            box-shadow: 0 4px 14px var(--accent-red-glow);
+        }
+
+        button.btn-primary:hover { 
+            transform: translateY(-1px);
+            box-shadow: 0 6px 18px var(--accent-red-glow);
+        }
+
+        .stat-box {
+            display: flex;
+            justify-content: space-around;
+            background: rgba(13, 14, 18, 0.6);
+            padding: 14px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid var(--card-border);
+        }
+
+        .stat-item { text-align: center; }
+        .stat-value { font-size: 1.3rem; font-weight: 800; color: var(--accent-red); }
+        .stat-label { font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            margin-top: 10px;
+            border-radius: 8px;
+            border: 1px solid var(--card-border);
+        }
+
+        .admin-users-list {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.82rem;
+            min-width: 520px;
+            background: rgba(13, 14, 18, 0.4);
+        }
+
+        .admin-users-list th, .admin-users-list td {
+            padding: 10px 12px;
+            border-bottom: 1px solid var(--card-border);
+            text-align: left;
+        }
+
+        .admin-users-list th { color: var(--text-muted); font-weight: 600; background: rgba(255, 255, 255, 0.03); }
+
+        .user-clickable {
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            transition: opacity 0.2s;
+        }
+
+        .user-clickable:hover { opacity: 0.8; }
+
+        .user-row-avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            vertical-align: middle;
+            margin-right: 8px;
+            object-fit: cover;
+        }
+
+        .btn-action-small {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--card-border);
+            color: #fff;
+            padding: 5px 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.72rem;
+            margin-right: 3px;
+            margin-bottom: 3px;
+            display: inline-block;
+            transition: all 0.2s;
+        }
+
+        .btn-action-small:hover { background: rgba(255, 255, 255, 0.15); }
+        .btn-action-danger { color: #ff5555; border-color: rgba(255, 85, 85, 0.3); }
+        .btn-action-blue { color: var(--accent-blue); border-color: rgba(59, 130, 246, 0.3); }
+        .btn-action-gold { color: var(--accent-gold); border-color: rgba(245, 158, 11, 0.3); }
+
+        /* MODALS */
+        #auth-overlay, #banned-overlay, #maintenance-overlay, #user-modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(5, 6, 8, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            padding: 16px;
+            animation: fadeIn 0.25s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .auth-card {
+            width: 100%;
+            max-width: 380px;
+            background: var(--panel-bg);
+            backdrop-filter: blur(16px);
+            padding: 24px;
+            border-radius: 14px;
+            border: 1px solid var(--card-border);
+            box-shadow: 0 16px 40px rgba(0,0,0,0.5);
+        }
+
+        .user-modal-card {
+            width: 100%;
+            max-width: 450px;
+            max-height: 90vh;
+            overflow-y: auto;
+            background: #14161d;
+            border-radius: 14px;
+            border: 1px solid var(--card-border);
+            position: relative;
+            box-shadow: 0 16px 40px rgba(0,0,0,0.6);
+        }
+
+        .modal-close-btn {
+            position: absolute;
+            top: 10px;
+            right: 12px;
+            background: rgba(0,0,0,0.6);
+            border: 1px solid var(--card-border);
+            color: #fff;
+            font-size: 1.1rem;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            z-index: 10;
+            transition: background 0.2s;
+        }
+
+        .modal-close-btn:hover { background: rgba(255, 59, 92, 0.4); }
+
+        .tab-buttons { display: flex; gap: 8px; margin-bottom: 18px; }
+        .tab-btn { 
+            flex: 1; padding: 10px; background: rgba(13, 14, 18, 0.6); 
+            border: 1px solid var(--card-border); color: var(--text-muted); 
+            border-radius: 8px; cursor: pointer; font-size: 0.85rem; font-weight: 600;
+            transition: all 0.2s;
+        }
+        .tab-btn.active { color: #fff; border-color: rgba(255, 59, 92, 0.4); background: rgba(255, 59, 92, 0.15); }
+
+        /* MOBILE RESPONSIVE */
+        @media (max-width: 600px) {
+            header { justify-content: center; padding: 10px 8px; }
+            .logo { width: 100%; text-align: center; justify-content: center; font-size: 1.05rem; }
+            .nav-tabs { width: 100%; justify-content: center; gap: 4px; }
+            .nav-btn { font-size: 0.78rem; padding: 6px 10px; }
+            .profile-avatar { width: 68px; height: 68px; top: -34px; left: 12px; }
+            .profile-details { margin-left: 80px; }
+            .profile-name { font-size: 1.05rem; }
+            .profile-bio { font-size: 0.8rem; }
+            .card-panel { padding: 16px 12px; }
+            #toast-container { left: 10px; right: 10px; bottom: 10px; }
+            .toast { max-width: 100%; }
+        }
+    </style>
 </head>
 <body>
 
-    <!-- Контейнер для всплывающих уведомлений -->
-    <div id="toast-container"></div>
-
-    <header>
-        <div class="logo" onclick="showTab('feed')">🍓 GODOT DEVHUB</div>
-        <div class="nav-tabs" id="nav-tabs" style="display: none;">
-            <button class="nav-btn active" onclick="showTab('feed')">Игры</button>
-            <button class="nav-btn" onclick="showTab('publish')">+ Создать</button>
-            <button class="nav-btn" onclick="showTab('profile')">Профиль</button>
-            <button class="nav-btn" id="admin-tab-btn" style="display: none; color: var(--accent-red);" onclick="showTab('admin')">⚙️ Админ</button>
-            <button class="nav-btn" style="color: #ff5555;" onclick="handleLogout()">Выход</button>
-        </div>
-    </header>
-
-    <div id="global-announcement">📢 <span id="announcement-text"></span></div>
-
-    <!-- Модалка просмотра юзера -->
-    <div id="user-modal-overlay" style="display: none;">
-        <div class="user-modal-card">
-            <button class="modal-close-btn" onclick="closeUserModal()">✕</button>
-            <div class="profile-header" style="margin-bottom:0; border:none; border-radius:0;">
-                <div class="profile-banner" id="modal-user-banner"></div>
-                <div class="profile-info">
-                    <img src="https://via.placeholder.com/90" id="modal-user-avatar" class="profile-avatar" alt="Avatar">
-                    <div class="profile-details">
-                        <h2 class="profile-name">
-                            <span id="modal-user-name">User</span>
-                            <span id="modal-user-verified" class="verified-badge" style="display:none;">☑️</span>
-                            <span id="modal-user-dev" class="dev-badge" style="display:none;">👑 DEV</span>
-                            <span id="modal-user-admin" class="admin-badge" style="display:none;">ADMIN</span>
-                        </h2>
-                        <p class="profile-bio" id="modal-user-bio">Описание...</p>
-                    </div>
-                </div>
-            </div>
-
-            <div style="padding: 16px;">
-                <div style="display:flex; justify-content:space-between; font-size:0.8rem; color:var(--text-muted); margin-bottom:15px; background:rgba(13, 14, 18, 0.6); padding:10px 14px; border-radius:8px; border:1px solid var(--card-border);">
-                    <span>Статус: <b id="modal-user-status" style="color:#fff;">Активен</b></span>
-                    <span>Игр выложено: <b id="modal-user-games-count" style="color:var(--accent-red);">0</b></span>
-                </div>
-
-                <h4 style="margin: 0 0 10px 0; color:#fff; font-size:0.85rem;">🛠️ Модерация Профиля:</h4>
-                <div style="display:flex; flex-direction:column; gap:8px;">
-                    <button class="btn-primary" style="background:rgba(255,255,255,0.1); box-shadow:none; font-size:0.75rem; padding:9px;" onclick="adminResetProfileData()">🧹 Сбросить Аватар и Био</button>
-                    <div style="display:flex; gap:6px;">
-                        <button class="btn-action-small btn-action-blue" style="flex:1; padding:9px;" id="modal-btn-verify" onclick="modalToggleVerify()">Выдать ☑️</button>
-                        <button class="btn-action-small btn-action-gold" style="flex:1; padding:9px;" id="modal-btn-dev" onclick="modalToggleDev()">Выдать 👑 DEV</button>
-                    </div>
-                    <div style="display:flex; gap:6px;">
-                        <button class="btn-action-small" style="flex:1; padding:9px; border-color:var(--accent-purple); color:var(--accent-purple);" id="modal-btn-admin" onclick="modalToggleAdmin()">ADMIN</button>
-                        <button class="btn-action-small" style="flex:1; padding:9px;" id="modal-btn-mute" onclick="modalToggleMute()">Мут</button>
-                        <button class="btn-action-small btn-action-danger" style="flex:1; padding:9px;" id="modal-btn-ban" onclick="modalToggleBan()">Бан</button>
-                    </div>
-                    <button class="btn-primary" style="background:#8b0000; box-shadow:none; font-size:0.75rem; margin-top:6px; padding:9px;" onclick="adminDeleteUserAccount()">❌ Удалить Аккаунт Навсегда</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Модалка тех. работ -->
-    <div id="maintenance-overlay" style="display: none;">
-        <div class="auth-card" style="text-align: center;">
-            <h2 style="color: var(--accent-gold); margin-top:0;">🛠️ Технические работы</h2>
-            <p style="color: var(--text-muted); font-size: 0.85rem;">Платформа находится на техобслуживании. Попробуйте зайти позже.</p>
-            <button class="btn-primary" style="background:#222; box-shadow:none;" onclick="handleLogout()">Выйти</button>
-        </div>
-    </div>
-
-    <!-- Модалка бана -->
-    <div id="banned-overlay" style="display: none;">
-        <div class="auth-card" style="text-align: center;">
-            <h2 style="color: var(--accent-red); margin-top:0;">⛔ Вы заблокированы</h2>
-            <p style="color: var(--text-muted); font-size: 0.85rem;">Ваш аккаунт получил бан за нарушение правил.</p>
-            <button class="btn-primary" onclick="handleLogout()">Выйти</button>
-        </div>
-    </div>
-
-    <!-- Модалка входа -->
-    <div id="auth-overlay">
-        <div class="auth-card">
-            <div class="tab-buttons">
-                <button id="tab-login" class="tab-btn active" onclick="switchAuthTab('login')">Вход</button>
-                <button id="tab-register" class="tab-btn" onclick="switchAuthTab('register')">Регистрация</button>
-            </div>
-
-            <div id="form-login">
-                <input type="email" id="login-email" placeholder="Email...">
-                <input type="password" id="login-password" placeholder="Пароль...">
-                <button class="btn-primary" onclick="handleLogin()">Войти</button>
-            </div>
-
-            <div id="form-register" style="display: none;">
-                <input type="text" id="reg-username" placeholder="Игровой Ник...">
-                <input type="email" id="reg-email" placeholder="Email...">
-                <input type="password" id="reg-password" placeholder="Пароль (мин. 6 символов)...">
-                <button class="btn-primary" onclick="handleRegister()">Зарегистрироваться</button>
-            </div>
-        </div>
-    </div>
-
-    <main>
-        <!-- Вкладка 1: Игры -->
-        <section id="section-feed">
-            <h2 class="section-title">ПРОЕКТЫ СООБЩЕСТВА</h2>
-            
-            <div class="search-bar-container">
-                <input type="text" id="search-game-input" placeholder="🔍 Название игры или имя автора..." oninput="filterGames()">
-            </div>
-
-            <div class="games-grid" id="games-container">
-                <!-- Skeleton Loader -->
-                <div class="skeleton-card">
-                    <div class="skeleton-box" style="height: 140px; width: 100%;"></div>
-                    <div class="skeleton-box" style="height: 20px; width: 60%; margin: 0 auto;"></div>
-                    <div class="skeleton-box" style="height: 14px; width: 40%; margin: 0 auto;"></div>
-                    <div class="skeleton-box" style="height: 40px; width: 80%; margin: 10px auto 0 auto;"></div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Вкладка 2: Публикация Игры -->
-        <section id="section-publish" style="display: none;">
-            <div class="card-panel">
-                <h2 class="section-title" style="margin-bottom: 20px;">Опубликовать игру</h2>
-                
-                <label>Название игры:</label>
-                <input type="text" id="game-title" placeholder="Например: Cyber Godot Quest">
-
-                <label>Обложка (необязательно):</label>
-                <input type="file" id="game-cover-file" accept="image/*">
-
-                <label>Файл игры / Архив:</label>
-                <input type="file" id="game-file">
-
-                <label>Краткое описание:</label>
-                <textarea id="game-desc" rows="3" placeholder="Расскажите о вашей игре, управлении и сюжете..."></textarea>
-
-                <button class="btn-primary" id="pub-btn" onclick="publishGame()">Загрузить игру</button>
-            </div>
-        </section>
-
-        <!-- Вкладка 3: Профиль -->
-        <section id="section-profile" style="display: none;">
-            <div class="profile-header">
-                <div class="profile-banner" id="view-banner"></div>
-                <div class="profile-info">
-                    <img src="https://via.placeholder.com/90" id="view-avatar" class="profile-avatar" alt="Avatar">
-                    <div class="profile-details">
-                        <h2 class="profile-name">
-                            <span id="view-username">Никнейм</span>
-                            <span id="view-verified-badge" class="verified-badge" style="display: none;" title="Подтверждён">☑️</span>
-                            <span id="view-dev-badge" class="dev-badge" style="display: none;">👑 DEV</span>
-                            <span id="view-admin-badge" class="admin-badge" style="display: none;">ADMIN</span>
-                        </h2>
-                        <p class="profile-bio" id="view-bio">Описание профиля не заполнено.</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="card-panel">
-                <h3 style="color: #fff; margin-top: 0; font-size: 0.95rem; margin-bottom: 16px;">Редактировать профиль</h3>
-                
-                <label>Загрузить Аватарку:</label>
-                <input type="file" id="edit-avatar-file" accept="image/*">
-                
-                <label>Загрузить Баннер:</label>
-                <input type="file" id="edit-banner-file" accept="image/*">
-                
-                <label>О себе / Статус:</label>
-                <textarea id="edit-bio" rows="3" placeholder="Разработчик игр на Godot..."></textarea>
-                
-                <button class="btn-primary" id="save-prof-btn" onclick="saveProfile()">Сохранить профиль</button>
-            </div>
-        </section>
-
-        <!-- Вкладка 4: Админка -->
-        <section id="section-admin" style="display: none;">
-            <div class="card-panel">
-                <h2 class="section-title" style="margin-bottom: 20px;">⚙️ Панель Разработчика</h2>
-                
-                <div class="stat-box">
-                    <div class="stat-item">
-                        <div class="stat-value" id="stat-users">0</div>
-                        <div class="stat-label">Пользователей</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-value" id="stat-games">0</div>
-                        <div class="stat-label">Игр загружено</div>
-                    </div>
-                </div>
-
-                <h3 style="color:#fff; font-size: 0.9rem; margin-top: 20px;">📢 Глобальное объявление</h3>
-                <textarea id="admin-announce-text" rows="2" placeholder="Текст объявления..."></textarea>
-                <div style="display:flex; gap:10px;">
-                    <button class="btn-primary" onclick="saveAnnouncement()">Опубликовать</button>
-                    <button class="btn-primary" style="background: rgba(255,255,255,0.1); box-shadow:none;" onclick="clearAnnouncement()">Убрать</button>
-                </div>
-
-                <h3 style="color:#fff; font-size: 0.9rem; margin-top: 20px;">🔔 Массовое уведомление (Alert)</h3>
-                <input type="text" id="admin-alert-text" placeholder="Текст короткого уведомления всем...">
-                <button class="btn-primary" style="background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); box-shadow: 0 4px 14px rgba(59, 130, 246, 0.35);" onclick="sendGlobalAlert()">Отправить всплывашку</button>
-
-                <h3 style="color:#fff; font-size: 0.9rem; margin-top: 25px;">👥 Управление пользователями</h3>
-                <input type="text" id="user-search-input" placeholder="🔍 Поиск по нику..." style="margin-top:5px; margin-bottom:10px;" oninput="filterUsersTable()">
-
-                <div class="table-responsive">
-                    <table class="admin-users-list">
-                        <thead>
-                            <tr>
-                                <th>Пользователь</th>
-                                <th>Роль / Статус</th>
-                                <th>Действия</th>
-                            </tr>
-                        </thead>
-                        <tbody id="admin-users-tbody">
-                            <!-- Данные пользователей рендерятся через JS -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </section>
-    </main>
-
-    <script>
-        // --- ИНИЦИАЛИЗАЦИЯ И ДАННЫЕ ---
-        let currentUser = JSON.parse(localStorage.getItem('devhub_current_user')) || null;
-        let users = JSON.parse(localStorage.getItem('devhub_users')) || [];
-        let games = JSON.parse(localStorage.getItem('devhub_games')) || [];
-        let announcement = localStorage.getItem('devhub_announcement') || '';
-        let selectedUserIdForModal = null;
-
-        // Инициализация при загрузке
-        document.addEventListener('DOMContentLoaded', () => {
-            checkAuthStatus();
-            loadAnnouncement();
-            renderGames();
-        });
-
-        // --- УВЕДОМЛЕНИЯ (TOASTS) ---
-        function showToast(message, type = 'info') {
-            const container = document.getElementById('toast-container');
-            const toast = document.createElement('div');
-            toast.className = `toast ${type}`;
-            toast.innerText = message;
-            container.appendChild(toast);
-            setTimeout(() => toast.remove(), 3500);
-        }
-
-        // --- АВТОРИЗАЦИЯ И НАВИГАЦИЯ ---
-        function switchAuthTab(type) {
-            document.getElementById('tab-login').classList.toggle('active', type === 'login');
-            document.getElementById('tab-register').classList.toggle('active', type === 'register');
-            document.getElementById('form-login').style.display = type === 'login' ? 'block' : 'none';
-            document.getElementById('form-register').style.display = type === 'register' ? 'block' : 'none';
-        }
-
-        function handleRegister() {
-            const username = document.getElementById('reg-username').value.trim();
-            const email = document.getElementById('reg-email').value.trim();
-            const password = document.getElementById('reg-password').value.trim();
-
-            if (!username || !email || password.length < 6) {
-                showToast('Заполните все поля (пароль от 6 символов)', 'error');
-                return;
-            }
-
-            if (users.find(u => u.email === email)) {
-                showToast('Пользователь с таким email уже существует', 'error');
-                return;
-            }
-
-            const newUser = {
-                id: Date.now(),
-                username,
-                email,
-                password,
-                avatar: '',
-                banner: '',
-                bio: '',
-                isAdmin: users.length === 0, // Первый зарегистрированный становится админом
-                isDev: false,
-                isVerified: false,
-                isBanned: false,
-                isMuted: false
-            };
-
-            users.push(newUser);
-            localStorage.setItem('devhub_users', JSON.stringify(users));
-            currentUser = newUser;
-            localStorage.setItem('devhub_current_user', JSON.stringify(currentUser));
-            
-            showToast('Регистрация успешна!', 'success');
-            checkAuthStatus();
-        }
-
-        function handleLogin() {
-            const email = document.getElementById('login-email').value.trim();
-            const password = document.getElementById('login-password').value.trim();
-
-            const user = users.find(u => u.email === email && u.password === password);
-            if (!user) {
-                showToast('Неверный email или пароль', 'error');
-                return;
-            }
-
-            if (user.isBanned) {
-                document.getElementById('banned-overlay').style.display = 'flex';
-                return;
-            }
-
-            currentUser = user;
-            localStorage.setItem('devhub_current_user', JSON.stringify(currentUser));
-            showToast('Вы успешно вошли!', 'success');
-            checkAuthStatus();
-        }
-
-        function handleLogout() {
-            currentUser = null;
-            localStorage.removeItem('devhub_current_user');
-            document.getElementById('auth-overlay').style.display = 'flex';
-            document.getElementById('nav-tabs').style.display = 'none';
-            document.getElementById('banned-overlay').style.display = 'none';
-            document.getElementById('maintenance-overlay').style.display = 'none';
-            showToast('Вы вышли из системы', 'info');
-        }
-
-        function checkAuthStatus() {
-            if (currentUser) {
-                document.getElementById('auth-overlay').style.display = 'none';
-                document.getElementById('nav-tabs').style.display = 'flex';
-                document.getElementById('admin-tab-btn').style.display = currentUser.isAdmin ? 'inline-block' : 'none';
-                updateProfileUI();
-                showTab('feed');
-            } else {
-                document.getElementById('auth-overlay').style.display = 'flex';
-                document.getElementById('nav-tabs').style.display = 'none';
-            }
-        }
-
-        function showTab(tabName) {
-            const tabs = ['feed', 'publish', 'profile', 'admin'];
-            tabs.forEach(tab => {
-                const el = document.getElementById(`section-${tab}`);
-                if (el) el.style.display = tab === tabName ? 'block' : 'none';
-            });
-
-            const btns = document.querySelectorAll('.nav-btn');
-            btns.forEach(btn => btn.classList.remove('active'));
-            
-            if (tabName === 'feed') renderGames();
-            if (tabName === 'profile') updateProfileUI();
-            if (tabName === 'admin' && currentUser?.isAdmin) renderAdminPanel();
-        }
-
-        // --- РАБОТА С ПРОФИЛЕМ ---
-        function updateProfileUI() {
-            if (!currentUser) return;
-            document.getElementById('view-username').innerText = currentUser.username;
-            document.getElementById('view-bio').innerText = currentUser.bio || 'Описание профиля не заполнено.';
-            document.getElementById('view-avatar').src = currentUser.avatar || 'https://via.placeholder.com/90';
-            
-            if (currentUser.banner) {
-                document.getElementById('view-banner').style.backgroundImage = `url(${currentUser.banner})`;
-            }
-
-            document.getElementById('view-verified-badge').style.display = currentUser.isVerified ? 'inline' : 'none';
-            document.getElementById('view-dev-badge').style.display = currentUser.isDev ? 'inline' : 'none';
-            document.getElementById('view-admin-badge').style.display = currentUser.isAdmin ? 'inline' : 'none';
-            
-            document.getElementById('edit-bio').value = currentUser.bio || '';
-        }
-
-        function saveProfile() {
-            const bio = document.getElementById('edit-bio').value.trim();
-            const avatarFile = document.getElementById('edit-avatar-file').files[0];
-            const bannerFile = document.getElementById('edit-banner-file').files[0];
-
-            currentUser.bio = bio;
-
-            const readAndSave = () => {
-                const index = users.findIndex(u => u.id === currentUser.id);
-                if (index !== -1) users[index] = currentUser;
-                
-                localStorage.setItem('devhub_users', JSON.stringify(users));
-                localStorage.setItem('devhub_current_user', JSON.stringify(currentUser));
-                updateProfileUI();
-                showToast('Профиль сохранен!', 'success');
-            };
-
-            if (avatarFile) {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    currentUser.avatar = e.target.result;
-                    if (bannerFile) {
-                        const reader2 = new FileReader();
-                        reader2.onload = (e2) => {
-                            currentUser.banner = e2.target.result;
-                            readAndSave();
-                        };
-                        reader2.readAsDataURL(bannerFile);
-                    } else readAndSave();
-                };
-                reader.readAsDataURL(avatarFile);
-            } else if (bannerFile) {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    currentUser.banner = e.target.result;
-                    readAndSave();
-                };
-                reader.readAsDataURL(bannerFile);
-            } else {
-                readAndSave();
-            }
-        }
-
-        // --- ПУБЛИКАЦИЯ И ОТОБРАЖЕНИЕ ИГР ---
-        function publishGame() {
-            const title = document.getElementById('game-title').value.trim();
-            const desc = document.getElementById('game-desc').value.trim();
-            const coverFile = document.getElementById('game-cover-file').files[0];
-
-            if (!title || !desc) {
-                showToast('Заполните название и описание игры', 'error');
-                return;
-            }
-
-            if (currentUser.isMuted) {
-                showToast('У вас мут. Вы не можете публиковать игры', 'error');
-                return;
-            }
-
-            const saveGameData = (coverUrl = '') => {
-                const newGame = {
-                    id: Date.now(),
-                    title,
-                    desc,
-                    cover: coverUrl,
-                    authorId: currentUser.id,
-                    authorName: currentUser.username
-                };
-                games.push(newGame);
-                localStorage.setItem('devhub_games', JSON.stringify(games));
-                showToast('Игра успешно опубликована!', 'success');
-                
-                document.getElementById('game-title').value = '';
-                document.getElementById('game-desc').value = '';
-                showTab('feed');
-            };
-
-            if (coverFile) {
-                const reader = new FileReader();
-                reader.onload = (e) => saveGameData(e.target.result);
-                reader.readAsDataURL(coverFile);
-            } else {
-                saveGameData();
-            }
-        }
-
-        function renderGames(filterText = '') {
-            const container = document.getElementById('games-container');
-            container.innerHTML = '';
-
-            const filtered = games.filter(g => 
-                g.title.toLowerCase().includes(filterText.toLowerCase()) || 
-                g.authorName.toLowerCase().includes(filterText.toLowerCase())
-            );
-
-            if (filtered.length === 0) {
-                container.innerHTML = '<p style="color:var(--text-muted);">Игры не найдены.</p>';
-                return;
-            }
-
-            filtered.forEach(game => {
-                const card = document.createElement('div');
-                card.className = 'game-card';
-                
-                const coverHtml = game.cover 
-                    ? `<div class="game-cover-wrapper"><img src="${game.cover}" class="game-cover"></div>` 
-                    : '';
-
-                const canDelete = currentUser && (currentUser.isAdmin || currentUser.id === game.authorId);
-                const deleteBtnHtml = canDelete 
-                    ? `<button class="btn-delete-link" onclick="deleteGame(${game.id})">Удалить</button>` 
-                    : '';
-
-                card.innerHTML = `
-                    ${coverHtml}
-                    <h3 class="game-title">${game.title}</h3>
-                    <div class="game-author">Автор: <b>${game.authorName}</b></div>
-                    <p class="game-desc">${game.desc}</p>
-                    <div class="card-actions">
-                        <a href="#" class="btn-download-link" onclick="showToast('Скачивание началось...', 'info')">Скачать</a>
-                        ${deleteBtnHtml}
-                    </div>
-                `;
-                container.appendChild(card);
-            });
-        }
-
-        function filterGames() {
-            const query = document.getElementById('search-game-input').value;
-            renderGames(query);
-        }
-
-        function deleteGame(gameId) {
-            games = games.filter(g => g.id !== gameId);
-            localStorage.setItem('devhub_games', JSON.stringify(games));
-            showToast('Игра удалена', 'info');
-            renderGames();
-        }
-
-        // --- АДМИН-ПАНЕЛЬ И ОБЪЯВЛЕНИЯ ---
-        function loadAnnouncement() {
-            const el = document.getElementById('global-announcement');
-            const textEl = document.getElementById('announcement-text');
-            if (announcement) {
-                textEl.innerText = announcement;
-                el.style.display = 'block';
-            } else {
-                el.style.display = 'none';
-            }
-        }
-
-        function saveAnnouncement() {
-            const text = document.getElementById('admin-announce-text').value.trim();
-            announcement = text;
-            localStorage.setItem('devhub_announcement', announcement);
-            loadAnnouncement();
-            showToast('Объявление обновлено', 'success');
-        }
-
-        function clearAnnouncement() {
-            announcement = '';
-            localStorage.removeItem('devhub_announcement');
-            loadAnnouncement();
-            showToast('Объявление убрано', 'info');
-        }
-
-        function sendGlobalAlert() {
-            const text = document.getElementById('admin-alert-text').value.trim();
-            if (text) {
-                showToast(`📢 ${text}`, 'info');
-                document.getElementById('admin-alert-text').value = '';
-            }
-        }
-
-        function renderAdminPanel() {
-            document.getElementById('stat-users').innerText = users.length;
-            document.getElementById('stat-games').innerText = games.length;
-            filterUsersTable();
-        }
-
-        function filterUsersTable() {
-            const tbody = document.getElementById('admin-users-tbody');
-            if (!tbody) return;
-            tbody.innerHTML = '';
-
-            const query = document.getElementById('user-search-input')?.value.toLowerCase() || '';
-            const filtered = users.filter(u => u.username.toLowerCase().includes(query));
-
-            filtered.forEach(u => {
-                const tr = document.createElement('tr');
-                const avatarSrc = u.avatar || 'https://via.placeholder.com/28';
-                
-                let roles = [];
-                if (u.isAdmin) roles.push('<span class="admin-badge">ADMIN</span>');
-                if (u.isDev) roles.push('<span class="dev-badge">DEV</span>');
-                if (u.isVerified) roles.push('<span class="verified-badge">☑️</span>');
-                if (u.isBanned) roles.push('<span style="color:#ff5555; font-weight:bold;">БАН</span>');
-
-                tr.innerHTML = `
-                    <td>
-                        <div class="user-clickable" onclick="openUserModal(${u.id})">
-                            <img src="${avatarSrc}" class="user-row-avatar">
-                            <b>${u.username}</b>
-                        </div>
-                    </td>
-                    <td>${roles.join(' ') || 'Пользователь'}</td>
-                    <td>
-                        <button class="btn-action-small" onclick="openUserModal(${u.id})">Управлять</button>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
-
-        // --- МОДАЛЬНОЕ ОКНО ПОЛЬЗОВАТЕЛЯ ---
-        function openUserModal(userId) {
-            selectedUserIdForModal = userId;
-            const targetUser = users.find(u => u.id === userId);
-            if (!targetUser) return;
-
-            document.getElementById('modal-user-name').innerText = targetUser.username;
-            document.getElementById('modal-user-bio').innerText = targetUser.bio || 'Нет описания';
-            document.getElementById('modal-user-avatar').src = targetUser.avatar || 'https://via.placeholder.com/90';
-            
-            if (targetUser.banner) {
-                document.getElementById('modal-user-banner').style.backgroundImage = `url(${targetUser.banner})`;
-            } else {
-                document.getElementById('modal-user-banner').style.backgroundImage = 'none';
-            }
-
-            document.getElementById('modal-user-verified').style.display = targetUser.isVerified ? 'inline' : 'none';
-            document.getElementById('modal-user-dev').style.display = targetUser.isDev ? 'inline' : 'none';
-            document.getElementById('modal-user-admin').style.display = targetUser.isAdmin ? 'inline' : 'none';
-
-            const userGamesCount = games.filter(g => g.authorId === userId).length;
-            document.getElementById('modal-user-games-count').innerText = userGamesCount;
-
-            const statusText = targetUser.isBanned ? 'Заблокирован' : (targetUser.isMuted ? 'Мут' : 'Активен');
-            document.getElementById('modal-user-status').innerText = statusText;
-
-            document.getElementById('user-modal-overlay').style.display = 'flex';
-        }
-
-        function closeUserModal() {
-            document.getElementById('user-modal-overlay').style.display = 'none';
-            selectedUserIdForModal = null;
-        }
-
-        function modalToggleVerify() {
-            const user = users.find(u => u.id === selectedUserIdForModal);
-            if (!user) return;
-            user.isVerified = !user.isVerified;
-            saveUsersState();
-            openUserModal(selectedUserIdForModal);
-        }
-
-        function modalToggleDev() {
-            const user = users.find(u => u.id === selectedUserIdForModal);
-            if (!user) return;
-            user.isDev = !user.isDev;
-            saveUsersState();
-            openUserModal(selectedUserIdForModal);
-        }
-
-        function modalToggleAdmin() {
-            const user = users.find(u => u.id === selectedUserIdForModal);
-            if (!user) return;
-            user.isAdmin = !user.isAdmin;
-            saveUsersState();
-            openUserModal(selectedUserIdForModal);
-        }
-
-        function modalToggleMute() {
-            const user = users.find(u => u.id === selectedUserIdForModal);
-            if (!user) return;
-            user.isMuted = !user.isMuted;
-            saveUsersState();
-            openUserModal(selectedUserIdForModal);
-        }
-
-        function modalToggleBan() {
-            const user = users.find(u => u.id === selectedUserIdForModal);
-            if (!user) return;
-            user.isBanned = !user.isBanned;
-            saveUsersState();
-            openUserModal(selectedUserIdForModal);
-        }
-
-        function adminResetProfileData() {
-            const user = users.find(u => u.id === selectedUserIdForModal);
-            if (!user) return;
-            user.avatar = '';
-            user.banner = '';
-            user.bio = '';
-            saveUsersState();
-            openUserModal(selectedUserIdForModal);
-            showToast('Данные профиля сброшены', 'info');
-        }
-
-        function adminDeleteUserAccount() {
-            if (!selectedUserIdForModal) return;
-            users = users.filter(u => u.id !== selectedUserIdForModal);
-            games = games.filter(g => g.authorId !== selectedUserIdForModal);
-            localStorage.setItem('devhub_users', JSON.stringify(users));
-            localStorage.setItem('devhub_games', JSON.stringify(games));
-            closeUserModal();
-            renderAdminPanel();
-            showToast('Аккаунт и его проекты удалены', 'info');
-        }
-
-        function saveUsersState() {
-            localStorage.setItem('devhub_users', JSON.stringify(users));
-            renderAdminPanel();
-        }
-    </script>
-</body>
-</html>
+    <!-- Контейнер для всплывающих уведомлений -->
+    <div id="toast-container"></div>
+
+    <header>
+        <div class="logo" onclick="showTab('feed')">🍓 GODOT DEVHUB</div>
+        <div class="nav-tabs" id="nav-tabs" style="display: none;">
+            <button class="nav-btn active" onclick="showTab('feed')">Игры</button>
+            <button class="nav-btn" onclick="showTab('publish')">+ Создать</button>
+            <button class="nav-btn" onclick="showTab('profile')">Профиль</button>
+            <button class="nav-btn" id="admin-tab-btn" style="display: none; color: var(--accent-red);" onclick="showTab('admin')">⚙️ Админ</button>
+            <button class="nav-btn" style="color: #ff5555;" onclick="handleLogout()">Выход</button>
+        </div>
+    </header>
+
+    <div id="global-announcement">📢 <span id="announcement-text"></span></div>
+
+    <!-- Модалка просмотра юзера -->
+    <div id="user-modal-overlay" style="display: none;">
+        <div class="user-modal-card">
+            <button class="modal-close-btn" onclick="closeUserModal()">✕</button>
+            <div class="profile-header" style="margin-bottom:0; border:none; border-radius:0;">
+                <div class="profile-banner" id="modal-user-banner"></div>
+                <div class="profile-info">
+                    <img src="https://via.placeholder.com/90" id="modal-user-avatar" class="profile-avatar" alt="Avatar">
+                    <div class="profile-details">
+                        <h2 class="profile-name">
+                            <span id="modal-user-name">User</span>
+                            <span id="modal-user-verified" class="verified-badge" style="display:none;">☑️</span>
+                            <span id="modal-user-dev" class="dev-badge" style="display:none;">👑 DEV</span>
+                            <span id="modal-user-admin" class="admin-badge" style="display:none;">ADMIN</span>
+                        </h2>
+                        <p class="profile-bio" id="modal-user-bio">Описание...</p>
+                    </div>
+                </div>
+            </div>
+
+            <div style="padding: 16px;">
+                <div style="display:flex; justify-content:space-between; font-size:0.8rem; color:var(--text-muted); margin-bottom:15px; background:rgba(13, 14, 18, 0.6); padding:10px 14px; border-radius:8px; border:1px solid var(--card-border);">
+                    <span>Статус: <b id="modal-user-status" style="color:#fff;">Активен</b></span>
+                    <span>Игр выложено: <b id="modal-user-games-count" style="color:var(--accent-red);">0</b></span>
+                </div>
+
+                <h4 style="margin: 0 0 10px 0; color:#fff; font-size:0.85rem;">🛠️ Модерация Профиля:</h4>
+                <div style="display:flex; flex-direction:column; gap:8px;">
+                    <button class="btn-primary" style="background:rgba(255,255,255,0.1); box-shadow:none; font-size:0.75rem; padding:9px;" onclick="adminResetProfileData()">🧹 Сбросить Аватар и Био</button>
+                    <div style="display:flex; gap:6px;">
+                        <button class="btn-action-small btn-action-blue" style="flex:1; padding:9px;" id="modal-btn-verify" onclick="modalToggleVerify()">Выдать ☑️</button>
+                        <button class="btn-action-small btn-action-gold" style="flex:1; padding:9px;" id="modal-btn-dev" onclick="modalToggleDev()">Выдать 👑 DEV</button>
+                    </div>
+                    <div style="display:flex; gap:6px;">
+                        <button class="btn-action-small" style="flex:1; padding:9px; border-color:var(--accent-purple); color:var(--accent-purple);" id="modal-btn-admin" onclick="modalToggleAdmin()">ADMIN</button>
+                        <button class="btn-action-small" style="flex:1; padding:9px;" id="modal-btn-mute" onclick="modalToggleMute()">Мут</button>
+                        <button class="btn-action-small btn-action-danger" style="flex:1; padding:9px;" id="modal-btn-ban" onclick="modalToggleBan()">Бан</button>
+                    </div>
+                    <button class="btn-primary" style="background:#8b0000; box-shadow:none; font-size:0.75rem; margin-top:6px; padding:9px;" onclick="adminDeleteUserAccount()">❌ Удалить Аккаунт Навсегда</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модалка тех. работ -->
+    <div id="maintenance-overlay" style="display: none;">
+        <div class="auth-card" style="text-align: center;">
+            <h2 style="color: var(--accent-gold); margin-top:0;">🛠️ Технические работы</h2>
+            <p style="color: var(--text-muted); font-size: 0.85rem;">Платформа находится на техобслуживании. Попробуйте зайти позже.</p>
+            <button class="btn-primary" style="background:#222; box-shadow:none;" onclick="handleLogout()">Выйти</button>
+        </div>
+    </div>
+
+    <!-- Модалка бана -->
+    <div id="banned-overlay" style="display: none;">
+        <div class="auth-card" style="text-align: center;">
+            <h2 style="color: var(--accent-red); margin-top:0;">⛔ Вы заблокированы</h2>
+            <p style="color: var(--text-muted); font-size: 0.85rem;">Ваш аккаунт получил бан за нарушение правил.</p>
+            <button class="btn-primary" onclick="handleLogout()">Выйти</button>
+        </div>
+    </div>
+
+    <!-- Модалка входа -->
+    <div id="auth-overlay">
+        <div class="auth-card">
+            <div class="tab-buttons">
+                <button id="tab-login" class="tab-btn active" onclick="switchAuthTab('login')">Вход</button>
+                <button id="tab-register" class="tab-btn" onclick="switchAuthTab('register')">Регистрация</button>
+            </div>
+
+            <div id="form-login">
+                <input type="email" id="login-email" placeholder="Email...">
+                <input type="password" id="login-password" placeholder="Пароль...">
+                <button class="btn-primary" onclick="handleLogin()">Войти</button>
+            </div>
+
+            <div id="form-register" style="display: none;">
+                <input type="text" id="reg-username" placeholder="Игровой Ник...">
+                <input type="email" id="reg-email" placeholder="Email...">
+                <input type="password" id="reg-password" placeholder="Пароль (мин. 6 символов)...">
+                <button class="btn-primary" onclick="handleRegister()">Зарегистрироваться</button>
+            </div>
+        </div>
+    </div>
+
+    <main>
+        <!-- Вкладка 1: Игры -->
+        <section id="section-feed">
+            <h2 class="section-title">ПРОЕКТЫ СООБЩЕСТВА</h2>
+            
+            <div class="search-bar-container">
+                <input type="text" id="search-game-input" placeholder="🔍 Название игры или имя автора..." oninput="filterGames()">
+            </div>
+
+            <div class="games-grid" id="games-container">
+                <!-- Skeleton Loader -->
+                <div class="skeleton-card">
+                    <div class="skeleton-box" style="height: 140px; width: 100%;"></div>
+                    <div class="skeleton-box" style="height: 20px; width: 60%; margin: 0 auto;"></div>
+                    <div class="skeleton-box" style="height: 14px; width: 40%; margin: 0 auto;"></div>
+                    <div class="skeleton-box" style="height: 40px; width: 80%; margin: 10px auto 0 auto;"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Вкладка 2: Публикация Игры -->
+        <section id="section-publish" style="display: none;">
+            <div class="card-panel">
+                <h2 class="section-title" style="margin-bottom: 20px;">Опубликовать игру</h2>
+                
+                <label>Название игры:</label>
+                <input type="text" id="game-title" placeholder="Например: Cyber Godot Quest">
+
+                <label>Обложка (необязательно):</label>
+                <input type="file" id="game-cover-file" accept="image/*">
+
+                <label>Файл игры / Архив:</label>
+                <input type="file" id="game-file">
+
+                <label>Краткое описание:</label>
+                <textarea id="game-desc" rows="3" placeholder="Расскажите о вашей игре, управлении и сюжете..."></textarea>
+
+                <button class="btn-primary" id="pub-btn" onclick="publishGame()">Загрузить игру</button>
+            </div>
+        </section>
+
+        <!-- Вкладка 3: Профиль -->
+        <section id="section-profile" style="display: none;">
+            <div class="profile-header">
+                <div class="profile-banner" id="view-banner"></div>
+                <div class="profile-info">
+                    <img src="https://via.placeholder.com/90" id="view-avatar" class="profile-avatar" alt="Avatar">
+                    <div class="profile-details">
+                        <h2 class="profile-name">
+                            <span id="view-username">Никнейм</span>
+                            <span id="view-verified-badge" class="verified-badge" style="display: none;" title="Подтверждён">☑️</span>
+                            <span id="view-dev-badge" class="dev-badge" style="display: none;">👑 DEV</span>
+                            <span id="view-admin-badge" class="admin-badge" style="display: none;">ADMIN</span>
+                        </h2>
+                        <p class="profile-bio" id="view-bio">Описание профиля не заполнено.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-panel">
+                <h3 style="color: #fff; margin-top: 0; font-size: 0.95rem; margin-bottom: 16px;">Редактировать профиль</h3>
+                
+                <label>Загрузить Аватарку:</label>
+                <input type="file" id="edit-avatar-file" accept="image/*">
+                
+                <label>Загрузить Баннер:</label>
+                <input type="file" id="edit-banner-file" accept="image/*">
+                
+                <label>О себе / Статус:</label>
+                <textarea id="edit-bio" rows="3" placeholder="Разработчик игр на Godot..."></textarea>
+                
+                <button class="btn-primary" id="save-prof-btn" onclick="saveProfile()">Сохранить профиль</button>
+            </div>
+        </section>
+
+        <!-- Вкладка 4: Админка -->
+        <section id="section-admin" style="display: none;">
+            <div class="card-panel">
+                <h2 class="section-title" style="margin-bottom: 20px;">⚙️ Панель Разработчика</h2>
+                
+                <div class="stat-box">
+                    <div class="stat-item">
+                        <div class="stat-value" id="stat-users">0</div>
+                        <div class="stat-label">Пользователей</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="stat-games">0</div>
+                        <div class="stat-label">Игр загружено</div>
+                    </div>
+                </div>
+
+                <h3 style="color:#fff; font-size: 0.9rem; margin-top: 20px;">📢 Глобальное объявление</h3>
+                <textarea id="admin-announce-text" rows="2" placeholder="Текст объявления..."></textarea>
+                <div style="display:flex; gap:10px;">
+                    <button class="btn-primary" onclick="saveAnnouncement()">Опубликовать</button>
+                    <button class="btn-primary" style="background: rgba(255,255,255,0.1); box-shadow:none;" onclick="clearAnnouncement()">Убрать</button>
+                </div>
+
+                <h3 style="color:#fff; font-size: 0.9rem; margin-top: 20px;">🔔 Массовое уведомление (Alert)</h3>
+                <input type="text" id="admin-alert-text" placeholder="Текст короткого уведомления всем...">
+                <button class="btn-primary" style="background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); box-shadow: 0 4px 14px rgba(59, 130, 246, 0.35);" onclick="sendGlobalAlert()">Отправить всплывашку</button>
+
+                <h3 style="color:#fff; font-size: 0.9rem; margin-top: 25px;">👥 Управление пользователями</h3>
+                <input type="text" id="user-search-input" placeholder="🔍 Поиск по нику..." style="margin-top:5px; margin-bottom:10px;" oninput="filterUsersTable()">
+
+                <div class="table-responsive">
+                    <table class="admin-users-list">
+                        <thead>
+                            <tr>
+                        
