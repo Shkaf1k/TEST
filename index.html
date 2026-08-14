@@ -11,7 +11,7 @@
             --card-bg: #1d102b;
             --accent-pink: #ff2a75;
             --accent-purple: #8b00ff;
-            --accent-blue: #478cbf; /* Godot Blue */
+            --accent-blue: #478cbf;
             --accent-green: #00ff88;
             --text-main: #ffffff;
             --text-muted: #a797be;
@@ -31,7 +31,6 @@
             flex-direction: column;
         }
 
-        /* Шапка сайта */
         header {
             height: 65px;
             background: linear-gradient(90deg, #1d0a2d, #0a060f);
@@ -44,21 +43,10 @@
             z-index: 10;
         }
 
-        .logo {
-            font-size: 1.4rem;
-            font-weight: bold;
-            color: #fff;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
+        .logo { font-size: 1.4rem; font-weight: bold; color: #fff; }
         .logo span { color: var(--accent-pink); }
 
-        .nav-tabs {
-            display: flex;
-            gap: 10px;
-        }
+        .nav-tabs { display: flex; gap: 10px; }
 
         .nav-btn {
             background: transparent;
@@ -77,7 +65,6 @@
             box-shadow: 0 0 10px var(--accent-pink);
         }
 
-        /* Основной контейнер */
         main {
             flex: 1;
             max-width: 1000px;
@@ -85,7 +72,6 @@
             margin: 25px auto;
         }
 
-        /* Баннер и шапка профиля */
         .profile-header {
             position: relative;
             background: var(--panel-bg);
@@ -123,7 +109,6 @@
         .profile-name { font-size: 1.5rem; margin: 0; }
         .profile-bio { color: var(--text-muted); margin: 5px 0 0 0; font-size: 0.95rem; }
 
-        /* Сетка игр */
         .games-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -163,7 +148,6 @@
         .game-desc { color: var(--text-muted); font-size: 0.9rem; flex: 1; margin-bottom: 15px; }
         .game-author { font-size: 0.8rem; color: var(--accent-pink); margin-bottom: 10px; }
 
-        /* Кнопки и формы */
         .card-panel {
             background: var(--panel-bg);
             padding: 25px;
@@ -172,10 +156,17 @@
             margin-bottom: 20px;
         }
 
-        input, textarea {
+        label {
+            display: block;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-bottom: 6px;
+        }
+
+        input[type="text"], input[type="email"], input[type="password"], textarea {
             width: 100%;
             padding: 12px;
-            margin-bottom: 12px;
+            margin-bottom: 15px;
             border-radius: 8px;
             border: 1px solid #3d1e56;
             background: #0d0614;
@@ -185,7 +176,17 @@
             font-family: inherit;
         }
 
-        input:focus, textarea:focus { border-color: var(--accent-pink); }
+        /* Стильные инпуты для файлов */
+        input[type="file"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            border: 1px dashed var(--accent-pink);
+            background: #0d0614;
+            color: var(--text-muted);
+            cursor: pointer;
+        }
 
         button.btn-primary {
             width: 100%;
@@ -200,9 +201,7 @@
             transition: 0.2s;
         }
 
-        button.btn-primary:hover {
-            box-shadow: 0 0 15px var(--accent-pink);
-        }
+        button.btn-primary:hover { box-shadow: 0 0 15px var(--accent-pink); }
 
         a.btn-download {
             display: block;
@@ -218,7 +217,6 @@
 
         a.btn-download:hover { background: #3573a1; }
 
-        /* Оверлей Авторизации */
         #auth-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -245,7 +243,6 @@
 </head>
 <body>
 
-    <!-- Шапка -->
     <header>
         <div class="logo">🍓 Godot <span>DevHub</span></div>
         <div class="nav-tabs" id="nav-tabs" style="display: none;">
@@ -256,7 +253,6 @@
         </div>
     </header>
 
-    <!-- Экран Входа / Регистрации -->
     <div id="auth-overlay">
         <div class="auth-card">
             <div class="tab-buttons">
@@ -271,7 +267,7 @@
             </div>
 
             <div id="form-register" style="display: none;">
-                <input type="text" id="reg-username" placeholder="Игровой Ник / Разработчик...">
+                <input type="text" id="reg-username" placeholder="Игровой Ник...">
                 <input type="email" id="reg-email" placeholder="Email...">
                 <input type="password" id="reg-password" placeholder="Пароль (мин. 6 символов)...">
                 <button class="btn-primary" onclick="handleRegister()">Зарегистрироваться</button>
@@ -279,9 +275,8 @@
         </div>
     </div>
 
-    <!-- Основной Контент -->
     <main>
-        <!-- Вкладка 1: Лента Игр -->
+        <!-- Вкладка 1: Игры -->
         <section id="section-feed">
             <h2 style="color: var(--accent-pink);">🔥 Игры сообщества Godot</h2>
             <div class="games-grid" id="games-container">
@@ -292,40 +287,48 @@
         <!-- Вкладка 2: Публикация Игры -->
         <section id="section-publish" style="display: none;">
             <div class="card-panel">
-                <h2 style="color: var(--accent-pink); margin-top: 0;">🚀 Опубликовать игру на Godot</h2>
-                <input type="text" id="game-title" placeholder="Название игры...">
-                <input type="url" id="game-cover" placeholder="Ссылка на обложку (URL картинки)...">
-                <input type="url" id="game-download" placeholder="Ссылка на скачивание (Google Drive / Mega / Itch.io)...">
-                <textarea id="game-desc" rows="4" placeholder="Описание игры, управление и фичи..."></textarea>
-                <button class="btn-primary" onclick="publishGame()">Загрузить игру 🍓</button>
+                <h2 style="color: var(--accent-pink); margin-top: 0;">🚀 Опубликовать игру</h2>
+                
+                <label>Название игры:</label>
+                <input type="text" id="game-title" placeholder="Мой крутой проект на Godot">
+
+                <label>Обложка игры (с ПК):</label>
+                <input type="file" id="game-cover-file" accept="image/*">
+
+                <label>Файл игры / Архив (с ПК, до 10MB) или ссылка:</label>
+                <input type="file" id="game-file">
+
+                <label>Описание:</label>
+                <textarea id="game-desc" rows="4" placeholder="Описание, управление и возможности..."></textarea>
+
+                <button class="btn-primary" id="pub-btn" onclick="publishGame()">Загрузить игру 🍓</button>
             </div>
         </section>
 
-        <!-- Вкладка 3: Мой Профиль и Настройки -->
+        <!-- Вкладка 3: Профиль -->
         <section id="section-profile" style="display: none;">
-            <!-- Отображение профиля -->
             <div class="profile-header">
                 <div class="profile-banner" id="view-banner"></div>
                 <div class="profile-info">
                     <img src="https://via.placeholder.com/110" id="view-avatar" class="profile-avatar" alt="Avatar">
                     <h2 class="profile-name" id="view-username">Никнейм</h2>
-                    <p class="profile-bio" id="view-bio">Описание профиля еще не заполнено.</p>
+                    <p class="profile-bio" id="view-bio">Описание профиля не заполнено.</p>
                 </div>
             </div>
 
-            <!-- Форма редактирования -->
             <div class="card-panel">
                 <h3 style="color: var(--accent-pink); margin-top: 0;">⚙️ Редактировать профиль</h3>
-                <label style="color: var(--text-muted); font-size: 0.85rem;">Ссылка на аватарку (URL):</label>
-                <input type="url" id="edit-avatar" placeholder="https://site.com/my-avatar.jpg">
                 
-                <label style="color: var(--text-muted); font-size: 0.85rem;">Ссылка на баннер (URL):</label>
-                <input type="url" id="edit-banner" placeholder="https://site.com/my-banner.jpg">
+                <label>Загрузить Аватарку с компьютера:</label>
+                <input type="file" id="edit-avatar-file" accept="image/*">
                 
-                <label style="color: var(--text-muted); font-size: 0.85rem;">О себе / Статус:</label>
-                <textarea id="edit-bio" rows="3" placeholder="Делаю платформер на Godot 4..."></textarea>
+                <label>Загрузить Баннер с компьютера:</label>
+                <input type="file" id="edit-banner-file" accept="image/*">
                 
-                <button class="btn-primary" onclick="saveProfile()">Сохранить профиль</button>
+                <label>О себе / Статус:</label>
+                <textarea id="edit-bio" rows="3" placeholder="Делаю игры на Godot 4..."></textarea>
+                
+                <button class="btn-primary" id="save-prof-btn" onclick="saveProfile()">Сохранить профиль</button>
             </div>
         </section>
     </main>
@@ -351,7 +354,9 @@
         const auth = firebase.auth();
         const db = firebase.database();
 
-        // Переключение между Входом и Регистрацией
+        let currentAvatarBase64 = '';
+        let currentBannerBase64 = '';
+
         function switchAuthTab(type) {
             if (type === 'login') {
                 document.getElementById('form-login').style.display = 'block';
@@ -366,7 +371,6 @@
             }
         }
 
-        // Переключение основных разделов
         function showTab(tabName) {
             document.getElementById('section-feed').style.display = tabName === 'feed' ? 'block' : 'none';
             document.getElementById('section-publish').style.display = tabName === 'publish' ? 'block' : 'none';
@@ -377,7 +381,6 @@
             if (event) event.target.classList.add('active');
         }
 
-        // Проверка Авторизации
         auth.onAuthStateChanged((user) => {
             if (user) {
                 document.getElementById('auth-overlay').style.display = 'none';
@@ -390,7 +393,6 @@
             }
         });
 
-        // Регистрация
         function handleRegister() {
             const nick = document.getElementById('reg-username').value.trim();
             const email = document.getElementById('reg-email').value.trim();
@@ -399,14 +401,12 @@
             if (!nick || !email || !pass) return alert("Заполни все поля!");
 
             auth.createUserWithEmailAndPassword(email, pass)
-                .then((cred) => {
-                    return cred.user.updateProfile({ displayName: nick });
-                })
+                .then((cred) => cred.user.updateProfile({ displayName: nick }))
                 .then(() => {
                     const uid = auth.currentUser.uid;
                     db.ref('users/' + uid).set({
                         username: nick,
-                        avatar: 'https://via.placeholder.com/110',
+                        avatar: '',
                         banner: '',
                         bio: 'Разработчик на Godot Engine 🎮'
                     });
@@ -414,7 +414,6 @@
                 .catch(err => alert("Ошибка: " + err.message));
         }
 
-        // Вход
         function handleLogin() {
             const email = document.getElementById('login-email').value.trim();
             const pass = document.getElementById('login-password').value;
@@ -426,74 +425,97 @@
 
         function handleLogout() { auth.signOut(); }
 
-        // Загрузка данных профиля
+        // Чтение файла как Base64
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+            });
+        }
+
         function loadUserProfile(uid, defaultName) {
             db.ref('users/' + uid).on('value', (snapshot) => {
                 const data = snapshot.val() || {};
                 document.getElementById('view-username').innerText = data.username || defaultName || 'Dev';
                 document.getElementById('view-bio').innerText = data.bio || 'Нет описания.';
                 
-                const avatarUrl = data.avatar || 'https://via.placeholder.com/110';
-                document.getElementById('view-avatar').src = avatarUrl;
-                document.getElementById('edit-avatar').value = data.avatar || '';
+                currentAvatarBase64 = data.avatar || '';
+                currentBannerBase64 = data.banner || '';
 
+                document.getElementById('view-avatar').src = data.avatar || 'https://via.placeholder.com/110';
                 if (data.banner) {
                     document.getElementById('view-banner').style.backgroundImage = `url('${data.banner}')`;
-                    document.getElementById('edit-banner').value = data.banner;
                 }
                 document.getElementById('edit-bio').value = data.bio || '';
             });
         }
 
-        // Сохранение отредактированного профиля
-        function saveProfile() {
+        // Сохранение Профиля
+        async function saveProfile() {
             const user = auth.currentUser;
             if (!user) return;
 
-            const avatar = document.getElementById('edit-avatar').value.trim();
-            const banner = document.getElementById('edit-banner').value.trim();
+            const saveBtn = document.getElementById('save-prof-btn');
+            saveBtn.innerText = "Сохранение...";
+
+            const avatarFile = document.getElementById('edit-avatar-file').files[0];
+            const bannerFile = document.getElementById('edit-banner-file').files[0];
             const bio = document.getElementById('edit-bio').value.trim();
 
+            if (avatarFile) currentAvatarBase64 = await fileToBase64(avatarFile);
+            if (bannerFile) currentBannerBase64 = await fileToBase64(bannerFile);
+
             db.ref('users/' + user.uid).update({
-                avatar: avatar,
-                banner: banner,
+                avatar: currentAvatarBase64,
+                banner: currentBannerBase64,
                 bio: bio
             }).then(() => {
                 alert("Профиль успешно обновлён! 🍓");
+                saveBtn.innerText = "Сохранить профиль";
             });
         }
 
-        // Опубликовать игру
-        function publishGame() {
+        // Публикация Игры
+        async function publishGame() {
             const user = auth.currentUser;
             if (!user) return;
 
             const title = document.getElementById('game-title').value.trim();
-            const cover = document.getElementById('game-cover').value.trim();
-            const download = document.getElementById('game-download').value.trim();
+            const coverFile = document.getElementById('game-cover-file').files[0];
+            const gameFile = document.getElementById('game-file').files[0];
             const desc = document.getElementById('game-desc').value.trim();
 
-            if (!title || !download) return alert("Заполни название и ссылку на скачивание!");
+            if (!title) return alert("Введи название игры!");
+
+            const pubBtn = document.getElementById('pub-btn');
+            pubBtn.innerText = "Публикация...";
+
+            let coverBase64 = 'https://via.placeholder.com/400x200';
+            let fileData = '#';
+
+            if (coverFile) coverBase64 = await fileToBase64(coverFile);
+            if (gameFile) fileData = await fileToBase64(gameFile);
 
             db.ref('games').push({
                 title: title,
-                cover: cover || 'https://via.placeholder.com/400x200',
-                download: download,
+                cover: coverBase64,
+                download: fileData,
+                fileName: gameFile ? gameFile.name : 'game.zip',
                 desc: desc,
                 author: user.displayName || 'Godot Dev',
                 authorUid: user.uid,
                 timestamp: Date.now()
             }).then(() => {
-                alert("Игра успешно опубликована! 🎉");
+                alert("Игра загружена! 🎉");
+                pubBtn.innerText = "Загрузить игру 🍓";
                 document.getElementById('game-title').value = '';
-                document.getElementById('game-cover').value = '';
-                document.getElementById('game-download').value = '';
                 document.getElementById('game-desc').value = '';
                 showTab('feed');
             });
         }
 
-        // Загрузить каталог игр
         function loadGames() {
             const container = document.getElementById('games-container');
             db.ref('games').on('value', (snapshot) => {
@@ -501,7 +523,7 @@
                 const games = snapshot.val();
                 
                 if (!games) {
-                    container.innerHTML = '<p style="color: var(--text-muted);">Пока нет опубликованных игр. Будь первым!</p>';
+                    container.innerHTML = '<p style="color: var(--text-muted);">Пока нет игр. Будь первым!</p>';
                     return;
                 }
 
@@ -514,7 +536,7 @@
                             <h3 class="game-title">${escapeHtml(game.title)}</h3>
                             <div class="game-author">Автор: ${escapeHtml(game.author)}</div>
                             <p class="game-desc">${escapeHtml(game.desc)}</p>
-                            <a href="${escapeHtml(game.download)}" target="_blank" class="btn-download">💾 Скачать игру</a>
+                            <a href="${escapeHtml(game.download)}" download="${escapeHtml(game.fileName || 'game')}" class="btn-download">💾 Скачать файл</a>
                         </div>
                     `;
                     container.appendChild(card);
