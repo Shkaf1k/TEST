@@ -12,6 +12,7 @@
             --accent-red: #ff3b3b;
             --accent-blue: #3b82f6;
             --accent-gold: #f59e0b;
+            --accent-purple: #8b5cf6;
             --border-color: #2e2e2e;
             --text-main: #ffffff;
             --text-muted: #aaaaaa;
@@ -40,13 +41,7 @@
             padding: 0 30px;
         }
 
-        .logo { 
-            font-size: 1.2rem; 
-            font-weight: bold; 
-            letter-spacing: 1px;
-            color: #fff; 
-        }
-
+        .logo { font-size: 1.2rem; font-weight: bold; letter-spacing: 1px; color: #fff; }
         .nav-tabs { display: flex; gap: 15px; }
 
         .nav-btn {
@@ -60,10 +55,7 @@
             transition: 0.2s;
         }
 
-        .nav-btn:hover, .nav-btn.active {
-            color: #fff;
-            background: #2a2a2a;
-        }
+        .nav-btn:hover, .nav-btn.active { color: #fff; background: #2a2a2a; }
 
         #global-announcement {
             background: rgba(255, 59, 59, 0.15);
@@ -91,12 +83,7 @@
             color: #ffffff;
         }
 
-        .games-grid {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            align-items: center;
-        }
+        .games-grid { display: flex; flex-direction: column; gap: 20px; align-items: center; }
 
         .game-card {
             background: var(--card-bg);
@@ -120,19 +107,8 @@
             margin-bottom: 15px;
         }
 
-        .game-title { 
-            font-size: 1.15rem; 
-            font-weight: bold; 
-            margin: 0 0 10px 0; 
-            color: #ffffff;
-        }
-
-        .game-desc { 
-            color: var(--text-muted); 
-            font-size: 0.85rem; 
-            line-height: 1.4;
-            margin-bottom: 15px; 
-        }
+        .game-title { font-size: 1.15rem; font-weight: bold; margin: 0 0 10px 0; color: #ffffff; }
+        .game-desc { color: var(--text-muted); font-size: 0.85rem; line-height: 1.4; margin-bottom: 15px; }
 
         .game-author { 
             font-size: 0.75rem; 
@@ -144,12 +120,7 @@
             gap: 4px;
         }
 
-        .card-actions {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 15px;
-        }
+        .card-actions { display: flex; justify-content: center; align-items: center; gap: 15px; }
 
         a.btn-download-link {
             color: var(--accent-red);
@@ -181,17 +152,9 @@
             margin-bottom: 30px;
         }
 
-        .profile-banner {
-            height: 140px;
-            background: #222;
-            background-size: cover;
-            background-position: center;
-        }
+        .profile-banner { height: 140px; background: #222; background-size: cover; background-position: center; }
 
-        .profile-info {
-            padding: 15px 20px 20px 140px;
-            position: relative;
-        }
+        .profile-info { padding: 15px 20px 20px 140px; position: relative; }
 
         .profile-avatar {
             width: 90px;
@@ -205,34 +168,12 @@
             object-fit: cover;
         }
 
-        .profile-name { font-size: 1.3rem; margin: 0; display: flex; align-items: center; gap: 8px; }
+        .profile-name { font-size: 1.3rem; margin: 0; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
         .profile-bio { color: var(--text-muted); margin: 6px 0 0 0; font-size: 0.85rem; }
 
-        .admin-badge {
-            background: var(--accent-red);
-            color: #fff;
-            font-size: 0.65rem;
-            padding: 2px 6px;
-            border-radius: 3px;
-            font-weight: bold;
-            letter-spacing: 1px;
-        }
-
-        .verified-badge {
-            color: var(--accent-blue);
-            font-size: 0.95rem;
-            line-height: 1;
-        }
-
-        .dev-badge {
-            background: var(--accent-gold);
-            color: #000;
-            font-size: 0.65rem;
-            padding: 2px 6px;
-            border-radius: 3px;
-            font-weight: bold;
-            letter-spacing: 1px;
-        }
+        .admin-badge { background: var(--accent-red); color: #fff; font-size: 0.65rem; padding: 2px 6px; border-radius: 3px; font-weight: bold; }
+        .verified-badge { color: var(--accent-blue); font-size: 0.95rem; line-height: 1; }
+        .dev-badge { background: var(--accent-gold); color: #000; font-size: 0.65rem; padding: 2px 6px; border-radius: 3px; font-weight: bold; }
 
         .card-panel {
             background: var(--panel-bg);
@@ -243,12 +184,7 @@
             margin: 0 auto 20px auto;
         }
 
-        label {
-            display: block;
-            color: var(--text-muted);
-            font-size: 0.8rem;
-            margin-bottom: 6px;
-        }
+        label { display: block; color: var(--text-muted); font-size: 0.8rem; margin-bottom: 6px; }
 
         input[type="text"], input[type="email"], input[type="password"], textarea {
             width: 100%;
@@ -261,10 +197,6 @@
             outline: none;
             font-family: inherit;
             font-size: 0.9rem;
-        }
-
-        input[type="text"]:focus, input[type="email"]:focus, input[type="password"]:focus, textarea:focus {
-            border-color: #555;
         }
 
         input[type="file"] {
@@ -313,7 +245,7 @@
         .admin-users-list {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 15px;
+            margin-top: 10px;
             font-size: 0.85rem;
         }
 
@@ -323,10 +255,16 @@
             text-align: left;
         }
 
-        .admin-users-list th {
-            color: var(--text-muted);
-            font-weight: normal;
+        .admin-users-list th { color: var(--text-muted); font-weight: normal; }
+
+        .user-clickable {
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            transition: opacity 0.2s;
         }
+
+        .user-clickable:hover { opacity: 0.8; text-decoration: underline; }
 
         .user-row-avatar {
             width: 28px;
@@ -346,6 +284,7 @@
             cursor: pointer;
             font-size: 0.75rem;
             margin-right: 4px;
+            margin-bottom: 2px;
         }
 
         .btn-action-small:hover { background: #333; }
@@ -353,7 +292,8 @@
         .btn-action-blue { color: var(--accent-blue); border-color: var(--accent-blue); }
         .btn-action-gold { color: var(--accent-gold); border-color: var(--accent-gold); }
 
-        #auth-overlay, #banned-overlay, #maintenance-overlay {
+        /* Оверлеи / Модалки */
+        #auth-overlay, #banned-overlay, #maintenance-overlay, #user-modal-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0, 0, 0, 0.92);
@@ -371,15 +311,36 @@
             border: 1px solid var(--border-color);
         }
 
+        .user-modal-card {
+            width: 450px;
+            max-width: 90%;
+            background: var(--panel-bg);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .modal-close-btn {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            background: rgba(0,0,0,0.6);
+            border: none;
+            color: #fff;
+            font-size: 1.2rem;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            z-index: 10;
+        }
+
         .tab-buttons { display: flex; gap: 10px; margin-bottom: 20px; }
         .tab-btn { 
-            flex: 1; 
-            padding: 8px; 
-            background: #121212; 
-            border: 1px solid var(--border-color); 
-            color: var(--text-muted); 
-            border-radius: 4px; 
-            cursor: pointer; 
+            flex: 1; padding: 8px; background: #121212; 
+            border: 1px solid var(--border-color); color: var(--text-muted); 
+            border-radius: 4px; cursor: pointer; 
         }
         .tab-btn.active { color: #fff; border-color: var(--accent-red); background: #222; }
     </style>
@@ -398,6 +359,47 @@
     </header>
 
     <div id="global-announcement">📢 <span id="announcement-text"></span></div>
+
+    <!-- Модалка Просмотра Юзера (Для Админа) -->
+    <div id="user-modal-overlay" style="display: none;">
+        <div class="user-modal-card">
+            <button class="modal-close-btn" onclick="closeUserModal()">✕</button>
+            <div class="profile-header" style="margin-bottom:0; border:none; border-radius:0;">
+                <div class="profile-banner" id="modal-user-banner"></div>
+                <div class="profile-info">
+                    <img src="https://via.placeholder.com/90" id="modal-user-avatar" class="profile-avatar" alt="Avatar">
+                    <h2 class="profile-name">
+                        <span id="modal-user-name">User</span>
+                        <span id="modal-user-verified" class="verified-badge" style="display:none;">☑️</span>
+                        <span id="modal-user-dev" class="dev-badge" style="display:none;">👑 DEV</span>
+                        <span id="modal-user-admin" class="admin-badge" style="display:none;">ADMIN</span>
+                    </h2>
+                    <p class="profile-bio" id="modal-user-bio">Описание...</p>
+                </div>
+            </div>
+
+            <div style="padding: 20px;">
+                <div style="display:flex; justify-content:space-between; font-size:0.85rem; color:var(--text-muted); margin-bottom:15px; background:#121212; padding:10px; border-radius:4px;">
+                    <span>Статус: <b id="modal-user-status" style="color:#fff;">Активен</b></span>
+                    <span>Игр выложено: <b id="modal-user-games-count" style="color:var(--accent-red);">0</b></span>
+                </div>
+
+                <h4 style="margin: 0 0 10px 0; color:#fff; font-size:0.9rem;">🛠️ Модерация Профеля:</h4>
+                <div style="display:flex; flex-direction:column; gap:8px;">
+                    <button class="btn-primary" style="background:#333; font-size:0.75rem;" onclick="adminResetProfileData()">🧹 Сбросить Аватар и Био юзера</button>
+                    <div style="display:flex; gap:5px; margin-top:5px;">
+                        <button class="btn-action-small btn-action-blue" style="flex:1; padding:8px;" id="modal-btn-verify" onclick="modalToggleVerify()">Выдать ☑️</button>
+                        <button class="btn-action-small btn-action-gold" style="flex:1; padding:8px;" id="modal-btn-dev" onclick="modalToggleDev()">Выдать 👑 DEV</button>
+                    </div>
+                    <div style="display:flex; gap:5px;">
+                        <button class="btn-action-small" style="flex:1; padding:8px; border-color:var(--accent-purple); color:var(--accent-purple);" id="modal-btn-admin" onclick="modalToggleAdmin()">Выдать ADMIN</button>
+                        <button class="btn-action-small" style="flex:1; padding:8px;" id="modal-btn-mute" onclick="modalToggleMute()">Мут</button>
+                        <button class="btn-action-small btn-action-danger" style="flex:1; padding:8px;" id="modal-btn-ban" onclick="modalToggleBan()">Бан</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Модалка тех. работ -->
     <div id="maintenance-overlay" style="display: none;">
@@ -529,13 +531,18 @@
                 <input type="text" id="admin-alert-text" placeholder="Текст короткого уведомления всем...">
                 <button class="btn-primary" style="background: var(--accent-blue);" onclick="sendGlobalAlert()">Отправить всплывашку</button>
 
-                <h3 style="color:#fff; font-size: 1rem; margin-top: 30px;">👥 Управление пользователями</h3>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-top: 30px;">
+                    <h3 style="color:#fff; font-size: 1rem; margin:0;">👥 Управление пользователями</h3>
+                </div>
+                
+                <input type="text" id="user-search-input" placeholder="🔍 Поиск пользователя по нику..." style="margin-top:10px; margin-bottom:5px;" oninput="filterUsersTable()">
+
                 <table class="admin-users-list">
                     <thead>
                         <tr>
-                            <th>Пользователь</th>
+                            <th>Пользователь (клик = профиль)</th>
                             <th>Статус</th>
-                            <th>Действия</th>
+                            <th>Быстрые действия</th>
                         </tr>
                     </thead>
                     <tbody id="admin-users-table">
@@ -578,7 +585,10 @@
         let isAdminUser = false;
         let isMutedUser = false;
         let isMaintenanceMode = false;
-        let userBadgesMap = {}; 
+        let userBadgesMap = {};
+        let selectedModalUid = null;
+        let allUsersData = {};
+        let allGamesData = {};
 
         function switchAuthTab(type) {
             if (type === 'login') {
@@ -696,7 +706,6 @@
                     }
                 }
 
-                // Проверка Режима тех. работ
                 if (isMaintenanceMode && !isAdminUser) {
                     document.getElementById('maintenance-overlay').style.display = 'flex';
                 } else {
@@ -787,9 +796,7 @@
 
         function deleteGame(gameId) {
             if (confirm("Вы действительно хотите удалить эту игру?")) {
-                db.ref('games/' + gameId).remove().then(() => {
-                    alert("Игра успешно удалена!");
-                });
+                db.ref('games/' + gameId).remove().then(() => alert("Игра успешно удалена!"));
             }
         }
 
@@ -810,6 +817,7 @@
                 db.ref('games').on('value', (snapshot) => {
                     container.innerHTML = '';
                     const games = snapshot.val();
+                    allGamesData = games || {};
                     
                     if (!games) {
                         container.innerHTML = '<p style="color: var(--text-muted);">Пока нет игр. Будь первым!</p>';
@@ -859,45 +867,120 @@
 
         function loadAdminUsersTable() {
             db.ref('users').on('value', snap => {
-                const tbody = document.getElementById('admin-users-table');
-                tbody.innerHTML = '';
-                const users = snap.val() || {};
-
-                Object.entries(users).forEach(([targetUid, targetUser]) => {
-                    const tr = document.createElement('tr');
-                    const avatarSrc = targetUser.avatar || 'https://via.placeholder.com/28';
-                    const isBanned = !!targetUser.isBanned;
-                    const isMuted = !!targetUser.isMuted;
-                    const isVerified = !!targetUser.isVerified;
-                    const isDev = !!targetUser.isDevBadge;
-
-                    let statusBadges = [];
-                    if (isBanned) statusBadges.push('<span style="color:red">БАН</span>');
-                    if (isMuted) statusBadges.push('<span style="color:orange">МУТ</span>');
-                    if (isVerified) statusBadges.push('<span style="color:var(--accent-blue)">☑️</span>');
-                    if (isDev) statusBadges.push('<span style="color:var(--accent-gold)">👑 DEV</span>');
-                    if (statusBadges.length === 0) statusBadges.push('<span style="color:gray">Обычный</span>');
-
-                    tr.innerHTML = `
-                        <td>
-                            <img src="${escapeHtml(avatarSrc)}" class="user-row-avatar">
-                            <b>${escapeHtml(targetUser.username || 'Пользователь')}</b>
-                        </td>
-                        <td>${statusBadges.join(' ')}</td>
-                        <td>
-                            <button class="btn-action-small btn-action-blue" onclick="toggleVerify('${targetUid}', ${!isVerified})">${isVerified ? 'Снять ☑️' : 'Дать ☑️'}</button>
-                            <button class="btn-action-small btn-action-gold" onclick="toggleDevBadge('${targetUid}', ${!isDev})">${isDev ? 'Снять 👑' : 'Дать 👑'}</button>
-                            <button class="btn-action-small" onclick="toggleMute('${targetUid}', ${!isMuted})">${isMuted ? 'Анмут' : 'Мут'}</button>
-                            <button class="btn-action-small btn-action-danger" onclick="toggleBan('${targetUid}', ${!isBanned})">${isBanned ? 'Разбан' : 'Бан'}</button>
-                        </td>
-                    `;
-                    tbody.appendChild(tr);
-                });
+                allUsersData = snap.val() || {};
+                renderUsersTable();
+                if (selectedModalUid && allUsersData[selectedModalUid]) {
+                    openUserModal(selectedModalUid);
+                }
             });
+        }
+
+        function renderUsersTable() {
+            const tbody = document.getElementById('admin-users-table');
+            tbody.innerHTML = '';
+            const searchFilter = (document.getElementById('user-search-input').value || '').toLowerCase();
+
+            Object.entries(allUsersData).forEach(([targetUid, targetUser]) => {
+                const name = targetUser.username || 'Пользователь';
+                if (searchFilter && !name.toLowerCase().includes(searchFilter)) return;
+
+                const tr = document.createElement('tr');
+                const avatarSrc = targetUser.avatar || 'https://via.placeholder.com/28';
+                const isBanned = !!targetUser.isBanned;
+                const isMuted = !!targetUser.isMuted;
+                const isVerified = !!targetUser.isVerified;
+                const isDev = !!targetUser.isDevBadge;
+                const isAdmin = !!targetUser.isAdmin;
+
+                let statusBadges = [];
+                if (isBanned) statusBadges.push('<span style="color:red">БАН</span>');
+                if (isMuted) statusBadges.push('<span style="color:orange">МУТ</span>');
+                if (isAdmin) statusBadges.push('<span style="color:red">ADMIN</span>');
+                if (isVerified) statusBadges.push('<span style="color:var(--accent-blue)">☑️</span>');
+                if (isDev) statusBadges.push('<span style="color:var(--accent-gold)">👑 DEV</span>');
+                if (statusBadges.length === 0) statusBadges.push('<span style="color:gray">Обычный</span>');
+
+                tr.innerHTML = `
+                    <td>
+                        <div class="user-clickable" onclick="openUserModal('${targetUid}')">
+                            <img src="${escapeHtml(avatarSrc)}" class="user-row-avatar">
+                            <b>${escapeHtml(name)}</b>
+                        </div>
+                    </td>
+                    <td>${statusBadges.join(' ')}</td>
+                    <td>
+                        <button class="btn-action-small btn-action-blue" onclick="toggleVerify('${targetUid}', ${!isVerified})">${isVerified ? 'Снять ☑️' : 'Дать ☑️'}</button>
+                        <button class="btn-action-small btn-action-gold" onclick="toggleDevBadge('${targetUid}', ${!isDev})">${isDev ? 'Снять 👑' : 'Дать 👑'}</button>
+                        <button class="btn-action-small" onclick="toggleMute('${targetUid}', ${!isMuted})">${isMuted ? 'Анмут' : 'Мут'}</button>
+                        <button class="btn-action-small btn-action-danger" onclick="toggleBan('${targetUid}', ${!isBanned})">${isBanned ? 'Разбан' : 'Бан'}</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function filterUsersTable() { renderUsersTable(); }
+
+        /* --- МОДАЛЬНОЕ ОКНО ПРОФИЛЯ --- */
+        function openUserModal(uid) {
+            selectedModalUid = uid;
+            const u = allUsersData[uid];
+            if (!u) return;
+
+            document.getElementById('modal-user-name').innerText = u.username || 'Без имени';
+            document.getElementById('modal-user-bio').innerText = u.bio || 'Описание не заполнено.';
+            document.getElementById('modal-user-avatar').src = u.avatar || 'https://via.placeholder.com/90';
+            
+            const banner = document.getElementById('modal-user-banner');
+            if (u.banner) banner.style.backgroundImage = `url('${u.banner}')`;
+            else banner.style.backgroundImage = 'none';
+
+            document.getElementById('modal-user-verified').style.display = u.isVerified ? 'inline' : 'none';
+            document.getElementById('modal-user-dev').style.display = u.isDevBadge ? 'inline' : 'none';
+            document.getElementById('modal-user-admin').style.display = u.isAdmin ? 'inline' : 'none';
+
+            document.getElementById('modal-user-status').innerText = u.isBanned ? 'Заблокирован (Бан)' : (u.isMuted ? 'Замучен (Мут)' : 'Активен');
+            document.getElementById('modal-user-status').style.color = u.isBanned ? 'red' : (u.isMuted ? 'orange' : '#00ff88');
+
+            let userGamesCount = 0;
+            Object.values(allGamesData).forEach(g => { if (g.authorUid === uid) userGamesCount++; });
+            document.getElementById('modal-user-games-count').innerText = userGamesCount;
+
+            // Кнопки действия
+            document.getElementById('modal-btn-verify').innerText = u.isVerified ? 'Снять ☑️' : 'Дать ☑️';
+            document.getElementById('modal-btn-dev').innerText = u.isDevBadge ? 'Снять 👑 DEV' : 'Дать 👑 DEV';
+            document.getElementById('modal-btn-admin').innerText = u.isAdmin ? 'Снять ADMIN' : 'Дать ADMIN';
+            document.getElementById('modal-btn-mute').innerText = u.isMuted ? 'Анмут' : 'Мут';
+            document.getElementById('modal-btn-ban').innerText = u.isBanned ? 'Разбан' : 'Бан';
+
+            document.getElementById('user-modal-overlay').style.display = 'flex';
+        }
+
+        function closeUserModal() {
+            selectedModalUid = null;
+            document.getElementById('user-modal-overlay').style.display = 'none';
+        }
+
+        function modalToggleVerify() { if (selectedModalUid) toggleVerify(selectedModalUid, !allUsersData[selectedModalUid].isVerified); }
+        function modalToggleDev() { if (selectedModalUid) toggleDevBadge(selectedModalUid, !allUsersData[selectedModalUid].isDevBadge); }
+        function modalToggleAdmin() { if (selectedModalUid) toggleAdmin(selectedModalUid, !allUsersData[selectedModalUid].isAdmin); }
+        function modalToggleMute() { if (selectedModalUid) toggleMute(selectedModalUid, !allUsersData[selectedModalUid].isMuted); }
+        function modalToggleBan() { if (selectedModalUid) toggleBan(selectedModalUid, !allUsersData[selectedModalUid].isBanned); }
+
+        function adminResetProfileData() {
+            if (!selectedModalUid) return;
+            if (confirm("Сбросить аватар, баннер и био пользователя?")) {
+                db.ref('users/' + selectedModalUid).update({
+                    avatar: '',
+                    banner: '',
+                    bio: 'Информация удалена администрацией.'
+                }).then(() => alert("Профиль очищен!"));
+            }
         }
 
         function toggleVerify(uid, status) { db.ref('users/' + uid).update({ isVerified: status }); }
         function toggleDevBadge(uid, status) { db.ref('users/' + uid).update({ isDevBadge: status }); }
+        function toggleAdmin(uid, status) { db.ref('users/' + uid).update({ isAdmin: status }); }
         function toggleMute(uid, status) { db.ref('users/' + uid).update({ isMuted: status }); }
         function toggleBan(uid, status) { db.ref('users/' + uid).update({ isBanned: status }); }
 
