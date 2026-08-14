@@ -3,19 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Godot Dev Hub 🍓</title>
+    <title>Godot Dev Hub</title>
     <style>
         :root {
-            --bg-dark: #0a060f;
-            --panel-bg: #140b1f;
-            --card-bg: #1d102b;
-            --accent-pink: #ff2a75;
-            --accent-purple: #8b00ff;
-            --accent-blue: #478cbf;
-            --accent-green: #00ff88;
+            --bg-dark: #121212;
+            --panel-bg: #1a1a1a;
+            --card-bg: #1e1e1e;
+            --accent-red: #ff3b3b;
+            --border-color: #2e2e2e;
             --text-main: #ffffff;
-            --text-muted: #a797be;
-            --border: rgba(255, 42, 117, 0.25);
+            --text-muted: #aaaaaa;
         }
 
         * { box-sizing: border-box; }
@@ -23,7 +20,7 @@
         body {
             background-color: var(--bg-dark);
             color: var(--text-main);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             margin: 0;
             padding: 0;
             min-height: 100vh;
@@ -32,195 +29,224 @@
         }
 
         header {
-            height: 65px;
-            background: linear-gradient(90deg, #1d0a2d, #0a060f);
-            border-bottom: 2px solid var(--accent-pink);
+            height: 60px;
+            background: var(--panel-bg);
+            border-bottom: 1px solid var(--border-color);
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 25px;
-            box-shadow: 0 0 20px rgba(255, 42, 117, 0.3);
-            z-index: 10;
+            padding: 0 30px;
         }
 
-        .logo { font-size: 1.4rem; font-weight: bold; color: #fff; }
-        .logo span { color: var(--accent-pink); }
+        .logo { 
+            font-size: 1.2rem; 
+            font-weight: bold; 
+            letter-spacing: 1px;
+            color: #fff; 
+        }
 
-        .nav-tabs { display: flex; gap: 10px; }
+        .nav-tabs { display: flex; gap: 15px; }
 
         .nav-btn {
             background: transparent;
             border: none;
             color: var(--text-muted);
-            padding: 8px 16px;
-            border-radius: 8px;
-            font-weight: bold;
+            padding: 6px 14px;
+            border-radius: 4px;
+            font-size: 0.9rem;
             cursor: pointer;
             transition: 0.2s;
         }
 
         .nav-btn:hover, .nav-btn.active {
-            background: var(--accent-pink);
             color: #fff;
-            box-shadow: 0 0 10px var(--accent-pink);
+            background: #2a2a2a;
         }
 
         main {
             flex: 1;
-            max-width: 1000px;
+            max-width: 900px;
             width: 90%;
-            margin: 25px auto;
+            margin: 40px auto;
         }
 
+        .section-title {
+            text-align: center;
+            font-size: 1.3rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 30px;
+            color: #ffffff;
+        }
+
+        /* Карточки игр (в точности как на скрине) */
+        .games-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .game-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            width: 100%;
+            max-width: 500px;
+            padding: 25px 20px;
+            text-align: center;
+            transition: border-color 0.2s;
+        }
+
+        .game-card:hover {
+            border-color: #444;
+        }
+
+        .game-cover {
+            width: 100%;
+            max-height: 220px;
+            object-fit: cover;
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
+
+        .game-title { 
+            font-size: 1.15rem; 
+            font-weight: bold; 
+            margin: 0 0 10px 0; 
+            color: #ffffff;
+        }
+
+        .game-desc { 
+            color: var(--text-muted); 
+            font-size: 0.85rem; 
+            line-height: 1.4;
+            margin-bottom: 15px; 
+        }
+
+        .game-author { 
+            font-size: 0.75rem; 
+            color: #777; 
+            margin-bottom: 12px; 
+        }
+
+        a.btn-download-link {
+            color: var(--accent-red);
+            font-size: 0.85rem;
+            font-weight: bold;
+            text-decoration: none;
+            transition: opacity 0.2s;
+        }
+
+        a.btn-download-link:hover {
+            opacity: 0.8;
+            text-decoration: underline;
+        }
+
+        /* Профиль */
         .profile-header {
-            position: relative;
             background: var(--panel-bg);
-            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
             overflow: hidden;
-            border: 1px solid var(--border);
-            margin-bottom: 25px;
+            margin-bottom: 30px;
         }
 
         .profile-banner {
-            height: 160px;
-            background: linear-gradient(135deg, var(--accent-purple), var(--accent-pink));
+            height: 140px;
+            background: #222;
             background-size: cover;
             background-position: center;
         }
 
         .profile-info {
-            padding: 15px 25px 25px 160px;
+            padding: 15px 20px 20px 140px;
             position: relative;
         }
 
         .profile-avatar {
-            width: 110px;
-            height: 110px;
+            width: 90px;
+            height: 90px;
             border-radius: 50%;
-            border: 4px solid var(--panel-bg);
-            background: #251338;
+            border: 3px solid var(--panel-bg);
+            background: #252525;
             position: absolute;
-            top: -55px;
-            left: 25px;
+            top: -45px;
+            left: 20px;
             object-fit: cover;
-            box-shadow: 0 0 15px rgba(0,0,0,0.5);
         }
 
-        .profile-name { font-size: 1.5rem; margin: 0; }
-        .profile-bio { color: var(--text-muted); margin: 5px 0 0 0; font-size: 0.95rem; }
+        .profile-name { font-size: 1.3rem; margin: 0; }
+        .profile-bio { color: var(--text-muted); margin: 6px 0 0 0; font-size: 0.85rem; }
 
-        .games-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 20px;
-        }
-
-        .game-card {
-            background: var(--card-bg);
-            border-radius: 12px;
-            border: 1px solid var(--border);
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            transition: 0.3s;
-        }
-
-        .game-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 5px 20px rgba(255, 42, 117, 0.3);
-        }
-
-        .game-cover {
-            height: 150px;
-            background: #11081a;
-            object-fit: cover;
-            width: 100%;
-        }
-
-        .game-body {
-            padding: 15px;
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .game-title { margin: 0 0 8px 0; font-size: 1.2rem; color: #fff; }
-        .game-desc { color: var(--text-muted); font-size: 0.9rem; flex: 1; margin-bottom: 15px; }
-        .game-author { font-size: 0.8rem; color: var(--accent-pink); margin-bottom: 10px; }
-
+        /* Панели форм */
         .card-panel {
             background: var(--panel-bg);
-            padding: 25px;
-            border-radius: 16px;
-            border: 1px solid var(--border);
-            margin-bottom: 20px;
+            padding: 30px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            max-width: 600px;
+            margin: 0 auto 20px auto;
         }
 
         label {
             display: block;
             color: var(--text-muted);
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             margin-bottom: 6px;
         }
 
         input[type="text"], input[type="email"], input[type="password"], textarea {
             width: 100%;
-            padding: 12px;
-            margin-bottom: 15px;
-            border-radius: 8px;
-            border: 1px solid #3d1e56;
-            background: #0d0614;
-            color: #fff;
-            outline: none;
-            box-sizing: border-box;
-            font-family: inherit;
-        }
-
-        /* Стильные инпуты для файлов */
-        input[type="file"] {
-            width: 100%;
             padding: 10px;
             margin-bottom: 15px;
-            border-radius: 8px;
-            border: 1px dashed var(--accent-pink);
-            background: #0d0614;
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
+            background: #121212;
+            color: #fff;
+            outline: none;
+            font-family: inherit;
+            font-size: 0.9rem;
+        }
+
+        input[type="text"]:focus, input[type="email"]:focus, input[type="password"]:focus, textarea:focus {
+            border-color: #555;
+        }
+
+        input[type="file"] {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+            border: 1px dashed var(--border-color);
+            background: #121212;
             color: var(--text-muted);
             cursor: pointer;
+            font-size: 0.85rem;
         }
 
         button.btn-primary {
             width: 100%;
-            padding: 12px;
-            background: linear-gradient(90deg, var(--accent-pink), var(--accent-purple));
+            padding: 10px;
+            background: var(--accent-red);
             color: #fff;
             border: none;
             font-weight: bold;
+            font-size: 0.85rem;
             cursor: pointer;
-            border-radius: 8px;
+            border-radius: 4px;
             text-transform: uppercase;
-            transition: 0.2s;
+            letter-spacing: 1px;
+            transition: opacity 0.2s;
         }
 
-        button.btn-primary:hover { box-shadow: 0 0 15px var(--accent-pink); }
+        button.btn-primary:hover { opacity: 0.9; }
 
-        a.btn-download {
-            display: block;
-            text-align: center;
-            background: var(--accent-blue);
-            color: #fff;
-            text-decoration: none;
-            padding: 10px;
-            border-radius: 8px;
-            font-weight: bold;
-            transition: 0.2s;
-        }
-
-        a.btn-download:hover { background: #3573a1; }
-
+        /* Модалка авторизации */
         #auth-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(10, 6, 15, 0.95);
+            background: rgba(0, 0, 0, 0.9);
             display: flex;
             justify-content: center;
             align-items: center;
@@ -228,28 +254,35 @@
         }
 
         .auth-card {
-            width: 380px;
+            width: 350px;
             background: var(--panel-bg);
-            padding: 30px;
-            border-radius: 16px;
-            border: 2px solid var(--accent-pink);
-            box-shadow: 0 0 30px rgba(255, 42, 117, 0.3);
+            padding: 25px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
         }
 
         .tab-buttons { display: flex; gap: 10px; margin-bottom: 20px; }
-        .tab-btn { flex: 1; padding: 10px; background: #281438; border: 1px solid var(--accent-pink); color: #fff; border-radius: 8px; cursor: pointer; }
-        .tab-btn.active { background: var(--accent-pink); }
+        .tab-btn { 
+            flex: 1; 
+            padding: 8px; 
+            background: #121212; 
+            border: 1px solid var(--border-color); 
+            color: var(--text-muted); 
+            border-radius: 4px; 
+            cursor: pointer; 
+        }
+        .tab-btn.active { color: #fff; border-color: var(--accent-red); background: #222; }
     </style>
 </head>
 <body>
 
     <header>
-        <div class="logo">🍓 Godot <span>DevHub</span></div>
+        <div class="logo">🍓 GODOT DEVHUB</div>
         <div class="nav-tabs" id="nav-tabs" style="display: none;">
-            <button class="nav-btn active" onclick="showTab('feed')">🎮 Игры</button>
-            <button class="nav-btn" onclick="showTab('publish')">➕ Опубликовать</button>
-            <button class="nav-btn" onclick="showTab('profile')">👤 Мой Профиль</button>
-            <button class="nav-btn" style="color: #ff4444;" onclick="handleLogout()">Выход</button>
+            <button class="nav-btn active" onclick="showTab('feed')">Иигры</button>
+            <button class="nav-btn" onclick="showTab('publish')">+ Опубликовать</button>
+            <button class="nav-btn" onclick="showTab('profile')">Мой Профиль</button>
+            <button class="nav-btn" style="color: #ff5555;" onclick="handleLogout()">Выход</button>
         </div>
     </header>
 
@@ -278,7 +311,7 @@
     <main>
         <!-- Вкладка 1: Игры -->
         <section id="section-feed">
-            <h2 style="color: var(--accent-pink);">🔥 Игры сообщества Godot</h2>
+            <h2 class="section-title">МОИ ИГРЫ</h2>
             <div class="games-grid" id="games-container">
                 <p style="color: var(--text-muted);">Загрузка проектов...</p>
             </div>
@@ -287,21 +320,21 @@
         <!-- Вкладка 2: Публикация Игры -->
         <section id="section-publish" style="display: none;">
             <div class="card-panel">
-                <h2 style="color: var(--accent-pink); margin-top: 0;">🚀 Опубликовать игру</h2>
+                <h2 class="section-title" style="margin-bottom: 20px;">Опубликовать игру</h2>
                 
                 <label>Название игры:</label>
-                <input type="text" id="game-title" placeholder="Мой крутой проект на Godot">
+                <input type="text" id="game-title" placeholder="Название игры">
 
-                <label>Обложка игры (с ПК):</label>
+                <label>Обложка (необязательно, файл с ПК):</label>
                 <input type="file" id="game-cover-file" accept="image/*">
 
-                <label>Файл игры / Архив (с ПК, до 10MB) или ссылка:</label>
+                <label>Файл игры / Архив (с ПК):</label>
                 <input type="file" id="game-file">
 
-                <label>Описание:</label>
-                <textarea id="game-desc" rows="4" placeholder="Описание, управление и возможности..."></textarea>
+                <label>Краткое описание:</label>
+                <textarea id="game-desc" rows="3" placeholder="Краткое описание вашей игры на Godot."></textarea>
 
-                <button class="btn-primary" id="pub-btn" onclick="publishGame()">Загрузить игру 🍓</button>
+                <button class="btn-primary" id="pub-btn" onclick="publishGame()">Загрузить игру</button>
             </div>
         </section>
 
@@ -310,23 +343,23 @@
             <div class="profile-header">
                 <div class="profile-banner" id="view-banner"></div>
                 <div class="profile-info">
-                    <img src="https://via.placeholder.com/110" id="view-avatar" class="profile-avatar" alt="Avatar">
+                    <img src="https://via.placeholder.com/90" id="view-avatar" class="profile-avatar" alt="Avatar">
                     <h2 class="profile-name" id="view-username">Никнейм</h2>
                     <p class="profile-bio" id="view-bio">Описание профиля не заполнено.</p>
                 </div>
             </div>
 
             <div class="card-panel">
-                <h3 style="color: var(--accent-pink); margin-top: 0;">⚙️ Редактировать профиль</h3>
+                <h3 style="color: #fff; margin-top: 0; font-size: 1rem; margin-bottom: 20px;">Редактировать профиль</h3>
                 
-                <label>Загрузить Аватарку с компьютера:</label>
+                <label>Загрузить Аватарку с ПК:</label>
                 <input type="file" id="edit-avatar-file" accept="image/*">
                 
-                <label>Загрузить Баннер с компьютера:</label>
+                <label>Загрузить Баннер с ПК:</label>
                 <input type="file" id="edit-banner-file" accept="image/*">
                 
                 <label>О себе / Статус:</label>
-                <textarea id="edit-bio" rows="3" placeholder="Делаю игры на Godot 4..."></textarea>
+                <textarea id="edit-bio" rows="3" placeholder="Разработчик игр на Godot..."></textarea>
                 
                 <button class="btn-primary" id="save-prof-btn" onclick="saveProfile()">Сохранить профиль</button>
             </div>
@@ -425,7 +458,6 @@
 
         function handleLogout() { auth.signOut(); }
 
-        // Чтение файла как Base64
         function fileToBase64(file) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
@@ -444,7 +476,7 @@
                 currentAvatarBase64 = data.avatar || '';
                 currentBannerBase64 = data.banner || '';
 
-                document.getElementById('view-avatar').src = data.avatar || 'https://via.placeholder.com/110';
+                document.getElementById('view-avatar').src = data.avatar || 'https://via.placeholder.com/90';
                 if (data.banner) {
                     document.getElementById('view-banner').style.backgroundImage = `url('${data.banner}')`;
                 }
@@ -452,7 +484,6 @@
             });
         }
 
-        // Сохранение Профиля
         async function saveProfile() {
             const user = auth.currentUser;
             if (!user) return;
@@ -472,12 +503,11 @@
                 banner: currentBannerBase64,
                 bio: bio
             }).then(() => {
-                alert("Профиль успешно обновлён! 🍓");
+                alert("Профиль обновлён!");
                 saveBtn.innerText = "Сохранить профиль";
             });
         }
 
-        // Публикация Игры
         async function publishGame() {
             const user = auth.currentUser;
             if (!user) return;
@@ -490,9 +520,9 @@
             if (!title) return alert("Введи название игры!");
 
             const pubBtn = document.getElementById('pub-btn');
-            pubBtn.innerText = "Публикация...";
+            pubBtn.innerText = "Загрузка...";
 
-            let coverBase64 = 'https://via.placeholder.com/400x200';
+            let coverBase64 = '';
             let fileData = '#';
 
             if (coverFile) coverBase64 = await fileToBase64(coverFile);
@@ -503,13 +533,13 @@
                 cover: coverBase64,
                 download: fileData,
                 fileName: gameFile ? gameFile.name : 'game.zip',
-                desc: desc,
+                desc: desc || 'Краткое описание вашей игры на Godot.',
                 author: user.displayName || 'Godot Dev',
                 authorUid: user.uid,
                 timestamp: Date.now()
             }).then(() => {
-                alert("Игра загружена! 🎉");
-                pubBtn.innerText = "Загрузить игру 🍓";
+                alert("Игра загружена!");
+                pubBtn.innerText = "Загрузить игру";
                 document.getElementById('game-title').value = '';
                 document.getElementById('game-desc').value = '';
                 showTab('feed');
@@ -530,14 +560,15 @@
                 Object.values(games).reverse().forEach(game => {
                     const card = document.createElement('div');
                     card.className = 'game-card';
+                    
+                    const coverHtml = game.cover ? `<img src="${escapeHtml(game.cover)}" class="game-cover" alt="Cover">` : '';
+                    
                     card.innerHTML = `
-                        <img src="${escapeHtml(game.cover)}" class="game-cover" alt="${escapeHtml(game.title)}">
-                        <div class="game-body">
-                            <h3 class="game-title">${escapeHtml(game.title)}</h3>
-                            <div class="game-author">Автор: ${escapeHtml(game.author)}</div>
-                            <p class="game-desc">${escapeHtml(game.desc)}</p>
-                            <a href="${escapeHtml(game.download)}" download="${escapeHtml(game.fileName || 'game')}" class="btn-download">💾 Скачать файл</a>
-                        </div>
+                        ${coverHtml}
+                        <h3 class="game-title">${escapeHtml(game.title)}</h3>
+                        <div class="game-author">Автор: ${escapeHtml(game.author)}</div>
+                        <p class="game-desc">${escapeHtml(game.desc)}</p>
+                        <a href="${escapeHtml(game.download)}" download="${escapeHtml(game.fileName || 'game')}" class="btn-download-link">Играть / Скачать</a>
                     `;
                     container.appendChild(card);
                 });
