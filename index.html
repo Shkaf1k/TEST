@@ -63,6 +63,17 @@
             background: #2a2a2a;
         }
 
+        /* Баннер глобального объявления */
+        #global-announcement {
+            background: rgba(255, 59, 59, 0.15);
+            border-bottom: 1px solid var(--accent-red);
+            color: #fff;
+            text-align: center;
+            padding: 10px 15px;
+            font-size: 0.9rem;
+            display: none;
+        }
+
         main {
             flex: 1;
             max-width: 900px;
@@ -99,9 +110,7 @@
             position: relative;
         }
 
-        .game-card:hover {
-            border-color: #444;
-        }
+        .game-card:hover { border-color: #444; }
 
         .game-cover {
             width: 100%;
@@ -146,10 +155,7 @@
             transition: opacity 0.2s;
         }
 
-        a.btn-download-link:hover {
-            opacity: 0.8;
-            text-decoration: underline;
-        }
+        a.btn-download-link:hover { opacity: 0.8; text-decoration: underline; }
 
         .btn-delete-link {
             background: transparent;
@@ -161,10 +167,7 @@
             padding: 0;
         }
 
-        .btn-delete-link:hover {
-            color: var(--accent-red);
-            text-decoration: underline;
-        }
+        .btn-delete-link:hover { color: var(--accent-red); text-decoration: underline; }
 
         /* Профиль */
         .profile-header {
@@ -199,8 +202,19 @@
             object-fit: cover;
         }
 
-        .profile-name { font-size: 1.3rem; margin: 0; }
+        .profile-name { font-size: 1.3rem; margin: 0; display: flex; align-items: center; gap: 8px; }
         .profile-bio { color: var(--text-muted); margin: 6px 0 0 0; font-size: 0.85rem; }
+
+        .admin-badge {
+            background: var(--accent-red);
+            color: #fff;
+            font-size: 0.65rem;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-weight: bold;
+            letter-spacing: 1px;
+            display: inline-block;
+        }
 
         /* Панели форм */
         .card-panel {
@@ -265,6 +279,20 @@
 
         button.btn-primary:hover { opacity: 0.9; }
 
+        .stat-box {
+            display: flex;
+            justify-content: space-around;
+            background: #121212;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border-color);
+        }
+
+        .stat-item { text-align: center; }
+        .stat-value { font-size: 1.4rem; font-weight: bold; color: var(--accent-red); }
+        .stat-label { font-size: 0.75rem; color: var(--text-muted); }
+
         /* Модалка авторизации */
         #auth-overlay {
             position: fixed;
@@ -302,12 +330,15 @@
     <header>
         <div class="logo">🍓 GODOT DEVHUB</div>
         <div class="nav-tabs" id="nav-tabs" style="display: none;">
-            <button class="nav-btn active" onclick="showTab('feed')">Игры</button>
+            <button class="nav-btn active" onclick="showTab('feed')">Иигры</button>
             <button class="nav-btn" onclick="showTab('publish')">+ Опубликовать</button>
             <button class="nav-btn" onclick="showTab('profile')">Мой Профиль</button>
+            <button class="nav-btn" id="admin-tab-btn" style="display: none; color: var(--accent-red);" onclick="showTab('admin')">⚙️ Админка</button>
             <button class="nav-btn" style="color: #ff5555;" onclick="handleLogout()">Выход</button>
         </div>
     </header>
+
+    <div id="global-announcement">📢 <span id="announcement-text"></span></div>
 
     <div id="auth-overlay">
         <div class="auth-card">
@@ -367,7 +398,10 @@
                 <div class="profile-banner" id="view-banner"></div>
                 <div class="profile-info">
                     <img src="https://via.placeholder.com/90" id="view-avatar" class="profile-avatar" alt="Avatar">
-                    <h2 class="profile-name" id="view-username">Никнейм</h2>
+                    <h2 class="profile-name">
+                        <span id="view-username">Никнейм</span>
+                        <span id="view-admin-badge" class="admin-badge" style="display: none;">ADMIN</span>
+                    </h2>
                     <p class="profile-bio" id="view-bio">Описание профиля не заполнено.</p>
                 </div>
             </div>
@@ -385,6 +419,29 @@
                 <textarea id="edit-bio" rows="3" placeholder="Разработчик игр на Godot..."></textarea>
                 
                 <button class="btn-primary" id="save-prof-btn" onclick="saveProfile()">Сохранить профиль</button>
+            </div>
+        </section>
+
+        <!-- Вкладка 4: Секретная Админка -->
+        <section id="section-admin" style="display: none;">
+            <div class="card-panel">
+                <h2 class="section-title" style="margin-bottom: 20px;">⚙️ Панель Разработчика</h2>
+                
+                <div class="stat-box">
+                    <div class="stat-item">
+                        <div class="stat-value" id="stat-users">0</div>
+                        <div class="stat-label">Пользователей</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="stat-games">0</div>
+                        <div class="stat-label">Игр загружено</div>
+                    </div>
+                </div>
+
+                <label>Глобальное объявление (для всех пользователей):</label>
+                <textarea id="admin-announce-text" rows="2" placeholder="Например: 'Технические работы 15 минут' или 'Приветствуем всех!'"></textarea>
+                <button class="btn-primary" style="margin-bottom: 15px;" onclick="saveAnnouncement()">Опубликовать объявление</button>
+                <button class="btn-primary" style="background: #333;" onclick="clearAnnouncement()">Убрать объявление</button>
             </div>
         </section>
     </main>
@@ -412,6 +469,7 @@
 
         let currentAvatarBase64 = '';
         let currentBannerBase64 = '';
+        let isAdminUser = false;
 
         function switchAuthTab(type) {
             if (type === 'login') {
@@ -431,6 +489,7 @@
             document.getElementById('section-feed').style.display = tabName === 'feed' ? 'block' : 'none';
             document.getElementById('section-publish').style.display = tabName === 'publish' ? 'block' : 'none';
             document.getElementById('section-profile').style.display = tabName === 'profile' ? 'block' : 'none';
+            document.getElementById('section-admin').style.display = tabName === 'admin' ? 'block' : 'none';
 
             const btns = document.querySelectorAll('.nav-btn');
             btns.forEach(btn => btn.classList.remove('active'));
@@ -441,13 +500,30 @@
             if (user) {
                 document.getElementById('auth-overlay').style.display = 'none';
                 document.getElementById('nav-tabs').style.display = 'flex';
+                
+                checkAdminStatus(user.uid);
                 loadUserProfile(user.uid, user.displayName);
                 loadGames();
+                listenAnnouncement();
             } else {
                 document.getElementById('auth-overlay').style.display = 'flex';
                 document.getElementById('nav-tabs').style.display = 'none';
             }
         });
+
+        // Проверка на Админа (первый зашедший или со специальной отметкой)
+        function checkAdminStatus(uid) {
+            db.ref('users/' + uid).once('value', (snapshot) => {
+                const data = snapshot.val() || {};
+                // Автоматически делаем тебя админом если статус isAdmin = true в БД
+                if (data.isAdmin) {
+                    isAdminUser = true;
+                    document.getElementById('admin-tab-btn').style.display = 'inline-block';
+                    document.getElementById('view-admin-badge').style.display = 'inline-block';
+                    loadAdminStats();
+                }
+            });
+        }
 
         function handleRegister() {
             const nick = document.getElementById('reg-username').value.trim();
@@ -460,11 +536,14 @@
                 .then((cred) => cred.user.updateProfile({ displayName: nick }))
                 .then(() => {
                     const uid = auth.currentUser.uid;
+                    // Если это твой ник Shkaf1k — делаем тебя сразу Админом
+                    const isDev = nick.toLowerCase().includes('shkaf1k');
                     db.ref('users/' + uid).set({
                         username: nick,
                         avatar: '',
                         banner: '',
-                        bio: 'Разработчик на Godot Engine 🎮'
+                        bio: 'Разработчик на Godot Engine 🎮',
+                        isAdmin: isDev
                     });
                 })
                 .catch(err => alert("Ошибка: " + err.message));
@@ -496,6 +575,12 @@
                 document.getElementById('view-username').innerText = data.username || defaultName || 'Dev';
                 document.getElementById('view-bio').innerText = data.bio || 'Нет описания.';
                 
+                if (data.isAdmin) {
+                    isAdminUser = true;
+                    document.getElementById('admin-tab-btn').style.display = 'inline-block';
+                    document.getElementById('view-admin-badge').style.display = 'inline-block';
+                }
+
                 currentAvatarBase64 = data.avatar || '';
                 currentBannerBase64 = data.banner || '';
 
@@ -571,7 +656,6 @@
             });
         }
 
-        // Функция удаления игры
         function deleteGame(gameId) {
             if (confirm("Вы действительно хотите удалить эту игру?")) {
                 db.ref('games/' + gameId).remove().then(() => {
@@ -601,10 +685,10 @@
                     
                     const coverHtml = game.cover ? `<img src="${escapeHtml(game.cover)}" class="game-cover" alt="Cover">` : '';
                     
-                    // Кнопка удаления показывается только для автора игры
-                    const isAuthor = currentUser && currentUser.uid === game.authorUid;
-                    const deleteBtnHtml = isAuthor 
-                        ? `<button class="btn-delete-link" onclick="deleteGame('${gameId}')">Удалить</button>` 
+                    // Кнопка удаления доступна АВТОРУ или АДМИНУ
+                    const canDelete = (currentUser && currentUser.uid === game.authorUid) || isAdminUser;
+                    const deleteBtnHtml = canDelete 
+                        ? `<button class="btn-delete-link" onclick="deleteGame('${gameId}')">${isAdminUser && currentUser.uid !== game.authorUid ? '[Админ Удалить]' : 'Удалить'}</button>` 
                         : '';
 
                     card.innerHTML = `
@@ -619,6 +703,39 @@
                     `;
                     container.appendChild(card);
                 });
+            });
+        }
+
+        /* --- ФУНКЦИИ АДМИНКИ --- */
+        function loadAdminStats() {
+            db.ref('users').on('value', snap => {
+                document.getElementById('stat-users').innerText = snap.numChildren() || 0;
+            });
+            db.ref('games').on('value', snap => {
+                document.getElementById('stat-games').innerText = snap.numChildren() || 0;
+            });
+        }
+
+        function saveAnnouncement() {
+            const text = document.getElementById('admin-announce-text').value.trim();
+            if (!text) return alert("Введите текст!");
+            db.ref('announcement').set(text).then(() => alert("Объявление выставлено!"));
+        }
+
+        function clearAnnouncement() {
+            db.ref('announcement').remove().then(() => alert("Объявление убрано!"));
+        }
+
+        function listenAnnouncement() {
+            db.ref('announcement').on('value', snap => {
+                const val = snap.val();
+                const box = document.getElementById('global-announcement');
+                if (val) {
+                    document.getElementById('announcement-text').innerText = val;
+                    box.style.display = 'block';
+                } else {
+                    box.style.display = 'none';
+                }
             });
         }
 
