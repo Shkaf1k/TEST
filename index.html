@@ -565,7 +565,10 @@
             position: fixed;
             top: 0; left: 0;
             width: 100%; height: 100%;
-            background: #000;
+            background-color: #000;
+            background-image: 
+                radial-gradient(at 15% 10%, rgba(255, 59, 92, 0.14) 0px, transparent 45%),
+                radial-gradient(at 85% 90%, rgba(59, 130, 246, 0.1) 0px, transparent 45%);
             z-index: 52;
         }
 
@@ -609,7 +612,7 @@
             background: linear-gradient(180deg, rgba(0,0,0,0.55), transparent);
         }
 
-        .vidfeed-back-btn, .vidfeed-upload-btn {
+        .vidfeed-back-btn {
             background: rgba(20, 20, 24, 0.6);
             border: 1px solid rgba(255,255,255,0.15);
             color: #fff;
@@ -619,6 +622,30 @@
             font-weight: 700;
             cursor: pointer;
             backdrop-filter: blur(6px);
+            transition: all 0.25s ease;
+        }
+
+        .vidfeed-back-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .vidfeed-upload-btn {
+            background: linear-gradient(135deg, var(--accent-red) 0%, #d92644 100%);
+            border: 1px solid rgba(255,255,255,0.15);
+            color: #fff;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            cursor: pointer;
+            backdrop-filter: blur(6px);
+            box-shadow: 0 4px 14px var(--accent-red-glow);
+            transition: all 0.25s ease;
+        }
+
+        .vidfeed-upload-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 18px var(--accent-red-glow);
         }
 
         .vidfeed-info {
@@ -674,7 +701,8 @@
         }
 
         .vidfeed-action-btn:active { transform: scale(0.9); }
-        .vidfeed-action-btn.liked { color: var(--accent-red); }
+        .vidfeed-action-btn:hover { background: rgba(255, 59, 92, 0.35); }
+        .vidfeed-action-btn.liked { color: var(--accent-red); box-shadow: 0 0 14px var(--accent-red-glow); }
 
         .vidfeed-action-count {
             font-size: 0.68rem;
@@ -687,6 +715,16 @@
             color: var(--text-muted);
             text-align: center;
             padding: 0 30px;
+        }
+
+        .vidfeed-empty .vidfeed-empty-title {
+            font-size: 1.15rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+            background: linear-gradient(180deg, #ffffff 0%, #9ca3af 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
         .vidfeed-upload-overlay {
@@ -779,6 +817,58 @@
 
         a.social-link-btn { cursor: pointer; transition: background 0.2s; }
         a.social-link-btn:hover { background: rgba(255, 59, 92, 0.15); }
+
+        /* --- LEADERBOARD (Топ авторов) --- */
+        .leaderboard-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(13, 14, 18, 0.6);
+            border: 1px solid var(--card-border);
+            border-radius: 10px;
+            padding: 8px 12px;
+            transition: border-color 0.2s, transform 0.2s;
+        }
+
+        .leaderboard-row:hover {
+            border-color: rgba(255, 59, 92, 0.35);
+            transform: translateX(2px);
+        }
+
+        .leaderboard-rank {
+            font-size: 1rem;
+            width: 26px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .leaderboard-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            object-fit: cover;
+            background: #20232c;
+            flex-shrink: 0;
+        }
+
+        .leaderboard-name {
+            flex: 1;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            flex-wrap: wrap;
+            word-break: break-word;
+        }
+
+        .leaderboard-score {
+            font-size: 0.72rem;
+            color: var(--accent-gold);
+            font-weight: 800;
+            white-space: nowrap;
+        }
 
         /* MOBILE RESPONSIVE */
         @media (max-width: 600px) {
@@ -907,6 +997,13 @@
             
             <div class="search-bar-container">
                 <input type="text" id="search-game-input" placeholder="🔍 Название игры или имя автора..." oninput="filterGames()">
+            </div>
+
+            <div class="card-panel" style="max-width: 540px;">
+                <h3 style="color:#fff; margin:0 0 14px 0; font-size:0.95rem; display:flex; align-items:center; gap:6px;">🏆 Топ авторов</h3>
+                <div id="leaderboard-list" style="display:flex; flex-direction:column; gap:10px;">
+                    <p style="color:var(--text-muted); font-size:0.85rem; margin:0;">Загрузка рейтинга...</p>
+                </div>
             </div>
 
             <div class="games-grid" id="games-container">
@@ -1730,7 +1827,7 @@
                 scroller.innerHTML = `
                     <div class="vidfeed-slide">
                         <div class="vidfeed-empty">
-                            <p style="font-size:1rem; color:#fff; font-weight:700;">Пока нет видео 🎬</p>
+                            <p class="vidfeed-empty-title">Пока нет видео 🎬</p>
                             <p style="font-size:0.85rem;">Нажмите «Загрузить видео», чтобы опубликовать первое!</p>
                         </div>
                     </div>
@@ -1934,6 +2031,76 @@
         }
 
         initProfileExtras();
+
+        // ==================== ТОП АВТОРОВ (ЛИДЕРБОРД) ====================
+
+        let lbUsersCache = {};
+        let lbGamesCache = {};
+        let lbVideosCache = {};
+
+        function computeLeaderboard() {
+            const box = document.getElementById('leaderboard-list');
+            if (!box) return;
+
+            const scores = {};
+            Object.entries(lbUsersCache).forEach(([uid, u]) => {
+                scores[uid] = {
+                    name: u.username || 'Игрок',
+                    avatar: u.avatar || '',
+                    verified: !!u.isVerified,
+                    dev: !!u.isDevBadge,
+                    games: 0,
+                    videos: 0,
+                    likes: 0,
+                    score: 0
+                };
+            });
+
+            Object.values(lbGamesCache).forEach(g => {
+                if (scores[g.authorUid]) scores[g.authorUid].games++;
+            });
+
+            Object.values(lbVideosCache).forEach(v => {
+                if (scores[v.authorUid]) {
+                    scores[v.authorUid].videos++;
+                    scores[v.authorUid].likes += Object.keys(v.likes || {}).length;
+                }
+            });
+
+            Object.values(scores).forEach(s => {
+                s.score = s.games * 3 + s.videos * 2 + s.likes;
+            });
+
+            const top = Object.values(scores).filter(s => s.score > 0).sort((a, b) => b.score - a.score).slice(0, 5);
+
+            if (top.length === 0) {
+                box.innerHTML = '<p style="color:var(--text-muted); font-size:0.85rem; margin:0;">Пока никто не публиковал контент.</p>';
+                return;
+            }
+
+            const medals = ['🥇', '🥈', '🥉', '4️⃣', '5️⃣'];
+
+            box.innerHTML = top.map((s, i) => `
+                <div class="leaderboard-row">
+                    <span class="leaderboard-rank">${medals[i] || (i + 1)}</span>
+                    <img src="${escapeHtml(s.avatar || 'https://via.placeholder.com/32')}" class="leaderboard-avatar">
+                    <div class="leaderboard-name">
+                        ${escapeHtml(s.name)}
+                        ${s.verified ? '<span class="verified-badge">☑️</span>' : ''}
+                        ${s.dev ? '<span class="dev-badge">👑</span>' : ''}
+                    </div>
+                    <span class="leaderboard-score">${s.score} очк.</span>
+                </div>
+            `).join('');
+        }
+
+        function initLeaderboard() {
+            db.ref('users').on('value', snap => { lbUsersCache = snap.val() || {}; computeLeaderboard(); });
+            db.ref('games').on('value', snap => { lbGamesCache = snap.val() || {}; computeLeaderboard(); });
+            db.ref('videos').on('value', snap => { lbVideosCache = snap.val() || {}; computeLeaderboard(); });
+        }
+
+        initLeaderboard();
     </script>
 </body>
 </html>
