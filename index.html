@@ -713,6 +713,73 @@
             position: relative;
         }
 
+        /* --- PROFILE EXTRAS (stats, achievements, social) --- */
+        .profile-joined-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            background: rgba(13, 14, 18, 0.6);
+            padding: 10px 14px;
+            border-radius: 8px;
+            border: 1px solid var(--card-border);
+            margin-bottom: 16px;
+        }
+
+        .achievements-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .achievement-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(245, 158, 11, 0.12);
+            border: 1px solid rgba(245, 158, 11, 0.35);
+            color: #fff;
+            padding: 8px 12px;
+            border-radius: 10px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            transition: transform 0.2s ease;
+        }
+
+        .achievement-badge:hover { transform: translateY(-2px); }
+
+        .achievement-badge.locked {
+            background: rgba(255, 255, 255, 0.03);
+            border-color: var(--card-border);
+            color: var(--text-muted);
+            opacity: 0.5;
+            filter: grayscale(1);
+        }
+
+        .social-links-display {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 8px;
+        }
+
+        .social-link-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid var(--card-border);
+            color: #fff;
+            padding: 5px 10px;
+            border-radius: 16px;
+            font-size: 0.75rem;
+            text-decoration: none;
+            cursor: default;
+        }
+
+        a.social-link-btn { cursor: pointer; transition: background 0.2s; }
+        a.social-link-btn:hover { background: rgba(255, 59, 92, 0.15); }
+
         /* MOBILE RESPONSIVE */
         @media (max-width: 600px) {
             header { justify-content: center; padding: 10px 8px; }
@@ -888,6 +955,7 @@
                             <span id="view-admin-badge" class="admin-badge" style="display: none;">ADMIN</span>
                         </h2>
                         <p class="profile-bio" id="view-bio">Описание профиля не заполнено.</p>
+                        <div class="social-links-display" id="view-social-links"></div>
                     </div>
                 </div>
             </div>
@@ -905,6 +973,45 @@
                 <textarea id="edit-bio" rows="3" placeholder="Разработчик игр на Godot..."></textarea>
                 
                 <button class="btn-primary" id="save-prof-btn" onclick="saveProfile()">Сохранить профиль</button>
+            </div>
+
+            <div class="card-panel">
+                <h3 style="color: #fff; margin-top: 0; font-size: 0.95rem; margin-bottom: 16px;">📊 Статистика</h3>
+                <div class="profile-joined-row">
+                    <span>Дата регистрации:</span>
+                    <b id="profile-joined-date" style="color:#fff;">—</b>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-item">
+                        <div class="stat-value" id="stat-my-games">0</div>
+                        <div class="stat-label">Игр</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="stat-my-videos">0</div>
+                        <div class="stat-label">Видео</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="stat-my-likes">0</div>
+                        <div class="stat-label">Лайков</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-panel">
+                <h3 style="color: #fff; margin-top: 0; font-size: 0.95rem; margin-bottom: 16px;">🏆 Достижения</h3>
+                <div class="achievements-row" id="profile-achievements"></div>
+            </div>
+
+            <div class="card-panel">
+                <h3 style="color: #fff; margin-top: 0; font-size: 0.95rem; margin-bottom: 16px;">🔗 Соц. сети</h3>
+
+                <label>Discord (ник или ссылка):</label>
+                <input type="text" id="social-discord-input" placeholder="например: username#0000">
+
+                <label>Сайт / itch.io:</label>
+                <input type="text" id="social-website-input" placeholder="https://...">
+
+                <button class="btn-primary" id="save-social-btn" onclick="saveSocialLinks()">Сохранить ссылки</button>
             </div>
         </section>
 
@@ -1723,6 +1830,110 @@
                 db.ref('videos/' + vidId).remove().then(() => showToast("Видео удалено!", "info"));
             }
         }
+
+        // ==================== ПРОФИЛЬ: СТАТИСТИКА, ДОСТИЖЕНИЯ, СОЦ. СЕТИ ====================
+
+        let myGamesCountVal = 0;
+        let myVideosCountVal = 0;
+        let myLikesReceivedVal = 0;
+
+        function renderSocialLinksDisplay(data) {
+            const box = document.getElementById('view-social-links');
+            if (!box) return;
+            let links = [];
+            if (data.socialDiscord) {
+                links.push(`<span class="social-link-btn">💬 ${escapeHtml(data.socialDiscord)}</span>`);
+            }
+            if (data.socialWebsite) {
+                links.push(`<a class="social-link-btn" href="${escapeHtml(data.socialWebsite)}" target="_blank" rel="noopener">🔗 Сайт / itch.io</a>`);
+            }
+            box.innerHTML = links.join(' ');
+        }
+
+        async function saveSocialLinks() {
+            const user = auth.currentUser;
+            if (!user) return;
+
+            const discord = document.getElementById('social-discord-input').value.trim();
+            const website = document.getElementById('social-website-input').value.trim();
+            const btn = document.getElementById('save-social-btn');
+            btn.innerText = "Сохранение...";
+
+            await db.ref('users/' + user.uid).update({ socialDiscord: discord, socialWebsite: website });
+            showToast("Ссылки сохранены!", "success");
+            btn.innerText = "Сохранить ссылки";
+        }
+
+        function renderAchievements() {
+            const box = document.getElementById('profile-achievements');
+            if (!box) return;
+
+            const achievements = [
+                { icon: '🎮', label: 'Первая игра', unlocked: myGamesCountVal >= 1 },
+                { icon: '🏗️', label: 'Разработчик (3+ игр)', unlocked: myGamesCountVal >= 3 },
+                { icon: '🎬', label: 'Первое видео', unlocked: myVideosCountVal >= 1 },
+                { icon: '📹', label: 'Видеоблогер (5+ видео)', unlocked: myVideosCountVal >= 5 },
+                { icon: '❤️', label: '10+ лайков', unlocked: myLikesReceivedVal >= 10 },
+                { icon: '🔥', label: '50+ лайков', unlocked: myLikesReceivedVal >= 50 }
+            ];
+
+            box.innerHTML = achievements.map(a => `
+                <div class="achievement-badge ${a.unlocked ? '' : 'locked'}" title="${escapeHtml(a.label)}">
+                    <span>${a.icon}</span>
+                    <span>${escapeHtml(a.label)}</span>
+                </div>
+            `).join('');
+        }
+
+        function initProfileExtras() {
+            auth.onAuthStateChanged((user) => {
+                if (!user) return;
+                const uid = user.uid;
+
+                db.ref('users/' + uid).once('value').then(snap => {
+                    const data = snap.val() || {};
+                    if (!data.joinedAt) {
+                        db.ref('users/' + uid).update({ joinedAt: Date.now() });
+                    }
+                });
+
+                db.ref('users/' + uid).on('value', (snap) => {
+                    const data = snap.val() || {};
+                    renderSocialLinksDisplay(data);
+
+                    const discordInput = document.getElementById('social-discord-input');
+                    const websiteInput = document.getElementById('social-website-input');
+                    if (discordInput && document.activeElement !== discordInput) discordInput.value = data.socialDiscord || '';
+                    if (websiteInput && document.activeElement !== websiteInput) websiteInput.value = data.socialWebsite || '';
+
+                    const joined = data.joinedAt ? new Date(data.joinedAt).toLocaleDateString('ru-RU') : '—';
+                    const joinedEl = document.getElementById('profile-joined-date');
+                    if (joinedEl) joinedEl.innerText = joined;
+                });
+
+                db.ref('games').on('value', (snap) => {
+                    const gData = snap.val() || {};
+                    myGamesCountVal = Object.values(gData).filter(g => g.authorUid === uid).length;
+                    const el = document.getElementById('stat-my-games');
+                    if (el) el.innerText = myGamesCountVal;
+                    renderAchievements();
+                });
+
+                db.ref('videos').on('value', (snap) => {
+                    const vData = snap.val() || {};
+                    const myVids = Object.values(vData).filter(v => v.authorUid === uid);
+                    myVideosCountVal = myVids.length;
+                    myLikesReceivedVal = myVids.reduce((sum, v) => sum + Object.keys(v.likes || {}).length, 0);
+                    const elV = document.getElementById('stat-my-videos');
+                    const elL = document.getElementById('stat-my-likes');
+                    if (elV) elV.innerText = myVideosCountVal;
+                    if (elL) elL.innerText = myLikesReceivedVal;
+                    renderAchievements();
+                });
+            });
+        }
+
+        initProfileExtras();
     </script>
 </body>
 </html>
