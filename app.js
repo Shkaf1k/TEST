@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { getFirestore, collection, getDocs, doc, getDoc, setDoc, updateDoc, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { getFirestore, collection, getDocs, doc, getDoc, setDoc, updateDoc, addDoc, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyACr1SSptV2sjy8KwAeihcGH7wGlxcG7D8",
@@ -20,6 +20,8 @@ const container = document.getElementById('videoContainer');
 const loginBtn = document.getElementById('loginBtn');
 const logoutBtn = document.getElementById('logoutBtn');
 const profileBtn = document.getElementById('profileBtn');
+const addVideoBtn = document.getElementById('addVideoBtn');
+
 const profileModal = document.getElementById('profileModal');
 const closeProfile = document.getElementById('closeProfile');
 const followBtn = document.getElementById('followBtn');
@@ -27,7 +29,12 @@ const editProfileBtn = document.getElementById('editProfileBtn');
 const editForm = document.getElementById('editForm');
 const saveProfileBtn = document.getElementById('saveProfileBtn');
 
+const uploadModal = document.getElementById('uploadModal');
+const closeUpload = document.getElementById('closeUpload');
+const publishVideoBtn = document.getElementById('publishVideoBtn');
+
 let currentViewedUserId = null;
+let selectedAvatarBase64 = null;
 
 // Логин
 loginBtn.onclick = async () => {
@@ -42,12 +49,13 @@ loginBtn.onclick = async () => {
 
 logoutBtn.onclick = () => signOut(auth);
 
-// Отслеживание состояния входа
+// Проверка состояния
 onAuthStateChanged(auth, async (user) => {
   if (user) {
     loginBtn.classList.add('hidden');
     logoutBtn.classList.remove('hidden');
     profileBtn.classList.remove('hidden');
+    addVideoBtn.classList.remove('hidden');
     
     const userRef = doc(db, "users", user.uid);
     const userSnap = await getDoc(userRef);
@@ -63,13 +71,18 @@ onAuthStateChanged(auth, async (user) => {
     loginBtn.classList.remove('hidden');
     logoutBtn.classList.add('hidden');
     profileBtn.classList.add('hidden');
+    addVideoBtn.classList.add('hidden');
   }
 });
 
-// Модальное окно
+// Управление модальными окнами
 profileBtn.onclick = () => openProfile(auth.currentUser.uid);
 closeProfile.onclick = () => profileModal.classList.add('hidden');
 
+addVideoBtn.onclick = () => uploadModal.classList.remove('hidden');
+closeUpload.onclick = () => uploadModal.classList.add('hidden');
+
+// Открытие профиля
 async function openProfile(userId) {
   currentViewedUserId = userId;
   profileModal.classList.remove('hidden');
@@ -100,21 +113,55 @@ async function openProfile(userId) {
   }
 }
 
-// Редактирование
+// Перевод файла изображения с ПК в Base64
+document.getElementById('avatarFileInput').onchange = (e) => {
+  const file = e.target.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      selectedAvatarBase64 = event.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
+};
+
+// Сохранение изменений профиля
 editProfileBtn.onclick = () => editForm.classList.toggle('hidden');
 
 saveProfileBtn.onclick = async () => {
   if (!auth.currentUser) return;
-  const avatarUrl = document.getElementById('editAvatarUrl').value;
   const bio = document.getElementById('editBioInput').value;
   
+  const updateData = {};
+  if (bio) updateData.bio = bio;
+  if (selectedAvatarBase64) updateData.avatarUrl = selectedAvatarBase64;
+
   const userRef = doc(db, "users", auth.currentUser.uid);
-  await updateDoc(userRef, {
-    ...(avatarUrl && { avatarUrl }),
-    ...(bio && { bio })
-  });
+  await updateDoc(userRef, updateData);
   
+  selectedAvatarBase64 = null;
   openProfile(auth.currentUser.uid);
+};
+
+// Публикация нового видео
+publishVideoBtn.onclick = async () => {
+  const url = document.getElementById('videoUrlInput').value;
+  const title = document.getElementById('videoTitleInput').value;
+
+  if (!url) return alert("Вставьте ссылку на видео");
+
+  await addDoc(collection(db, "videos"), {
+    url,
+    title,
+    authorId: auth.currentUser.uid,
+    authorName: auth.currentUser.email.split('@')[0],
+    likes: 0
+  });
+
+  uploadModal.classList.add('hidden');
+  document.getElementById('videoUrlInput').value = "";
+  document.getElementById('videoTitleInput').value = "";
+  loadVideos();
 };
 
 // Подписка
