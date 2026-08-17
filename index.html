@@ -8,11 +8,39 @@
 </head>
 <body>
 
-  <div class="app__videos" id="videoContainer">
-    <!-- Видео будут подгружаться из Firebase -->
+  <!-- Шапка с кнопками профиля -->
+  <header class="navbar">
+    <span class="logo">TikTok</span>
+    <div id="authButtons">
+      <button id="showAuthBtn">Войти</button>
+    </div>
+  </header>
+
+  <!-- Лента видео -->
+  <main class="app__videos" id="videoContainer"></main>
+
+  <!-- Окно авторизации / регистрации -->
+  <div class="modal hidden" id="authModal">
+    <div class="modal-content">
+      <span class="close-btn" id="closeAuth">&times;</span>
+      <h2 id="modalTitle">Вход</h2>
+      <input type="email" id="authEmail" placeholder="Email" required>
+      <input type="password" id="authPassword" placeholder="Пароль" required>
+      <button id="authSubmitBtn">Войти</button>
+      <p class="toggle-auth" id="toggleAuthText">Нет аккаунта? Зарегистрироваться</p>
+    </div>
   </div>
 
-  <!-- Подключение Firebase SDK (v9+) -->
+  <!-- Модальное окно профиля -->
+  <div class="modal hidden" id="profileModal">
+    <div class="modal-content">
+      <span class="close-btn" id="closeProfile">&times;</span>
+      <h2>Профиль</h2>
+      <p id="profileEmail"></p>
+      <button id="logoutBtn" class="logout-btn">Выйти</button>
+    </div>
+  </div>
+
   <script type="module" src="app.js"></script>
 </body>
 </html>
