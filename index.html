@@ -2033,7 +2033,7 @@
              
             if (!videoFile) return showToast("Выберите видеофайл!", "error");
             if (!videoFile.type.startsWith('video/')) return showToast("Файл должен быть видео!", "error");
-            if (videoFile.size > 500 * 1920 * 1080) return showToast("Видео слишком большое (макс. 25MB)!", "error"); #ХУЙНЯОСУКАНАХУЙБЛЯДЬ
+            if (videoFile.size > 500 * 1920 * 1080) return showToast("Видео слишком большое (макс. 500MB)!", "error");
                        
             const pubBtn = document.getElementById('video-pub-btn');
             pubBtn.innerText = "Загрузка...";
