@@ -3,26 +3,49 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TokTok Web</title>
+  <title>TokTok</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <!-- Верхний бар -->
   <header class="navbar">
     <div class="logo">TokTok</div>
     <div class="auth-bar">
       <input type="email" id="authEmail" placeholder="Email">
       <input type="password" id="authPassword" placeholder="Пароль">
       <button id="loginBtn" class="btn btn-primary">Войти</button>
+      <button id="profileBtn" class="btn btn-secondary hidden">Профиль</button>
       <button id="logoutBtn" class="btn btn-secondary hidden">Выйти</button>
     </div>
   </header>
 
-  <!-- Контейнер для видео -->
-  <main class="feed" id="videoContainer">
-    <!-- Сда загрузятся карточки -->
-  </main>
+  <!-- Модальное окно профиля -->
+  <div id="profileModal" class="modal hidden">
+    <div class="modal-content">
+      <span id="closeProfile" class="close">&times;</span>
+      <h2 id="profileUsername">Имя пользователя</h2>
+      <p id="profileEmailText" class="profile-email"></p>
+      
+      <div class="profile-stats">
+        <div class="stat-item">
+          <span id="followingCount" class="stat-num">0</span>
+          <span class="stat-label">Подписки</span>
+        </div>
+        <div class="stat-item">
+          <span id="followersCount" class="stat-num">0</span>
+          <span class="stat-label">Подписчики</span>
+        </div>
+        <div class="stat-item">
+          <span id="likesCount" class="stat-num">0</span>
+          <span class="stat-label">Лайки</span>
+        </div>
+      </div>
+
+      <button id="followBtn" class="btn btn-primary full-width hidden">Подписаться</button>
+    </div>
+  </div>
+
+  <main class="feed" id="videoContainer"></main>
 
   <script type="module" src="app.js"></script>
 </body>
