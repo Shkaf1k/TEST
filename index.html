@@ -870,6 +870,104 @@
             white-space: nowrap;
         }
 
+        /* --- LEVEL / XP (Steam-style) --- */
+        .level-badge {
+            width: 54px;
+            height: 54px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, var(--accent-gold), #d97706);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            font-weight: 900;
+            color: #000;
+            box-shadow: 0 4px 14px rgba(245, 158, 11, 0.35);
+            flex-shrink: 0;
+        }
+
+        .level-progress-bar {
+            width: 100%;
+            height: 10px;
+            border-radius: 6px;
+            background: rgba(13, 14, 18, 0.6);
+            border: 1px solid var(--card-border);
+            overflow: hidden;
+        }
+
+        .level-progress-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--accent-red), var(--accent-gold));
+            border-radius: 6px;
+            transition: width 0.4s ease;
+        }
+
+        /* --- MISC SITE FEATURES --- */
+        .scroll-top-btn {
+            position: fixed;
+            left: 20px;
+            bottom: 20px;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-red) 0%, #d92644 100%);
+            color: #fff;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            box-shadow: 0 4px 14px var(--accent-red-glow);
+            z-index: 900;
+            transition: transform 0.2s ease;
+        }
+        .scroll-top-btn:hover { transform: translateY(-2px); }
+
+        .header-games-counter {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--card-border);
+            padding: 4px 10px;
+            border-radius: 20px;
+            white-space: nowrap;
+        }
+
+        .search-clear-btn {
+            background: rgba(20, 20, 24, 0.6);
+            border: 1px solid var(--card-border);
+            color: #fff;
+            padding: 0 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        .site-stats-bar {
+            display: flex;
+            justify-content: center;
+            gap: 18px;
+            flex-wrap: wrap;
+            margin-top: 24px;
+            padding: 12px;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .game-of-day-box {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .game-of-day-cover {
+            width: 56px;
+            height: 56px;
+            border-radius: 8px;
+            object-fit: cover;
+            background: #20232c;
+            flex-shrink: 0;
+        }
+
         /* MOBILE RESPONSIVE */
         @media (max-width: 600px) {
             header { justify-content: center; padding: 10px 8px; }
@@ -891,8 +989,11 @@
     <!-- Контейнер для всплывающих уведомлений -->
     <div id="toast-container"></div>
 
+    <button id="scroll-top-btn" class="scroll-top-btn" style="display:none;" onclick="window.scrollTo({top:0, behavior:'smooth'})" title="Наверх">↑</button>
+
     <header>
         <div class="logo" onclick="showTab('feed')">🍓 GODOT DEVHUB</div>
+        <span id="header-games-counter" class="header-games-counter" style="display:none;"></span>
         <div class="nav-tabs" id="nav-tabs" style="display: none;">
             <button class="nav-btn active" onclick="showTab('feed')">Игры</button>
             <button class="nav-btn" onclick="showTab('vidfeed')">🎬 Видео</button>
@@ -978,6 +1079,7 @@
             <div id="form-login">
                 <input type="email" id="login-email" placeholder="Email...">
                 <input type="password" id="login-password" placeholder="Пароль...">
+                <a href="#" onclick="handleForgotPassword(); return false;" style="display:block; text-align:right; font-size:0.75rem; color:var(--text-muted); margin:-8px 0 12px 0; text-decoration:none;">Забыли пароль?</a>
                 <button class="btn-primary" onclick="handleLogin()">Войти</button>
             </div>
 
@@ -997,12 +1099,31 @@
             
             <div class="search-bar-container">
                 <input type="text" id="search-game-input" placeholder="🔍 Название игры или имя автора..." oninput="filterGames()">
+                <button type="button" id="search-clear-btn" class="search-clear-btn" style="display:none;" onclick="clearGameSearch()" title="Очистить">✕</button>
             </div>
 
             <div class="card-panel" style="max-width: 540px;">
                 <h3 style="color:#fff; margin:0 0 14px 0; font-size:0.95rem; display:flex; align-items:center; gap:6px;">🏆 Топ авторов</h3>
                 <div id="leaderboard-list" style="display:flex; flex-direction:column; gap:10px;">
                     <p style="color:var(--text-muted); font-size:0.85rem; margin:0;">Загрузка рейтинга...</p>
+                </div>
+            </div>
+
+            <div class="card-panel" style="max-width: 540px;">
+                <h3 style="color:#fff; margin:0 0 14px 0; font-size:0.95rem; display:flex; align-items:center; gap:6px;">⭐ Игра дня</h3>
+                <div id="game-of-day-box">
+                    <p style="color:var(--text-muted); font-size:0.85rem; margin:0;">Пока нет игр для выбора.</p>
+                </div>
+            </div>
+
+            <div style="max-width:540px; margin:0 auto 20px auto;">
+                <button class="btn-primary" onclick="goToRandomGame()">🎲 Случайная игра</button>
+            </div>
+
+            <div class="card-panel" style="max-width: 540px;">
+                <h3 style="color:#fff; margin:0 0 14px 0; font-size:0.95rem; display:flex; align-items:center; gap:6px;">🔥 Топ видео</h3>
+                <div id="top-videos-list" style="display:flex; flex-direction:column; gap:10px;">
+                    <p style="color:var(--text-muted); font-size:0.85rem; margin:0;">Загрузка...</p>
                 </div>
             </div>
 
@@ -1015,6 +1136,8 @@
                     <div class="skeleton-box" style="height: 40px; width: 80%; margin: 10px auto 0 auto;"></div>
                 </div>
             </div>
+
+            <div class="site-stats-bar" id="site-stats-bar"></div>
         </section>
 
         <!-- Вкладка 2: Публикация Игры -->
@@ -1096,7 +1219,13 @@
 
             <div class="card-panel">
                 <h3 style="color: #fff; margin-top: 0; font-size: 0.95rem; margin-bottom: 16px;">🏆 Достижения</h3>
+                <p id="achievements-progress" style="color:var(--text-muted); font-size:0.78rem; margin: -8px 0 14px 0;"></p>
                 <div class="achievements-row" id="profile-achievements"></div>
+            </div>
+
+            <div class="card-panel">
+                <h3 style="color: #fff; margin-top: 0; font-size: 0.95rem; margin-bottom: 16px;">🏅 Дополнительные достижения</h3>
+                <div class="achievements-row" id="profile-achievements-extra"></div>
             </div>
 
             <div class="card-panel">
@@ -1109,6 +1238,23 @@
                 <input type="text" id="social-website-input" placeholder="https://...">
 
                 <button class="btn-primary" id="save-social-btn" onclick="saveSocialLinks()">Сохранить ссылки</button>
+            </div>
+
+            <div class="card-panel">
+                <h3 style="color: #fff; margin-top: 0; font-size: 0.95rem; margin-bottom: 16px;">🎚️ Уровень</h3>
+                <div style="display:flex; align-items:center; gap:14px; margin-bottom:14px;">
+                    <div id="level-badge" class="level-badge">1</div>
+                    <div style="flex:1;">
+                        <div id="level-title" style="color:#fff; font-weight:700; font-size:0.95rem;">Новичок</div>
+                        <div id="level-xp-text" style="color:var(--text-muted); font-size:0.75rem; margin-top:2px;">0 / 100 XP</div>
+                    </div>
+                </div>
+                <div class="level-progress-bar"><div id="level-progress-fill" class="level-progress-fill"></div></div>
+            </div>
+
+            <div class="card-panel">
+                <h3 style="color: #fff; margin-top: 0; font-size: 0.95rem; margin-bottom: 16px;">📋 Поделиться</h3>
+                <button class="btn-primary" style="background: rgba(255,255,255,0.1); box-shadow:none;" onclick="shareProfile()">Скопировать инфо профиля</button>
             </div>
         </section>
 
@@ -2101,6 +2247,394 @@
         }
 
         initLeaderboard();
+
+        // ==================== УРОВЕНЬ (STEAM-STYLE) ====================
+
+        let lvlGamesCount = 0;
+        let lvlVideosCount = 0;
+        let lvlLikesCount = 0;
+
+        function xpForLevel(level) {
+            return Math.round(100 * Math.pow(level, 1.4));
+        }
+
+        function computeLevelFromXp(xp) {
+            let level = 1;
+            while (xp >= xpForLevel(level)) level++;
+            return level;
+        }
+
+        function levelTitle(level) {
+            if (level >= 20) return 'Легенда Godot';
+            if (level >= 12) return 'Мастер разработки';
+            if (level >= 7) return 'Опытный разработчик';
+            if (level >= 3) return 'Разработчик';
+            return 'Новичок';
+        }
+
+        function currentXp() {
+            return lvlGamesCount * 30 + lvlVideosCount * 20 + lvlLikesCount * 2;
+        }
+
+        function currentLevel() {
+            return computeLevelFromXp(currentXp());
+        }
+
+        function renderLevel() {
+            const badge = document.getElementById('level-badge');
+            if (!badge) return;
+
+            const xp = currentXp();
+            const level = computeLevelFromXp(xp);
+            const xpFloor = level === 1 ? 0 : xpForLevel(level - 1);
+            const xpCeil = xpForLevel(level);
+            const progressPct = Math.min(100, Math.round(((xp - xpFloor) / (xpCeil - xpFloor)) * 100));
+
+            badge.innerText = level;
+            const titleEl = document.getElementById('level-title');
+            const xpTextEl = document.getElementById('level-xp-text');
+            const fillEl = document.getElementById('level-progress-fill');
+            if (titleEl) titleEl.innerText = levelTitle(level);
+            if (xpTextEl) xpTextEl.innerText = `${xp} / ${xpCeil} XP`;
+            if (fillEl) fillEl.style.width = progressPct + '%';
+
+            renderExtraAchievements();
+        }
+
+        function initLevelSystem() {
+            auth.onAuthStateChanged((user) => {
+                if (!user) return;
+                const uid = user.uid;
+
+                db.ref('games').on('value', (snap) => {
+                    const gData = snap.val() || {};
+                    lvlGamesCount = Object.values(gData).filter(g => g.authorUid === uid).length;
+                    renderLevel();
+                });
+
+                db.ref('videos').on('value', (snap) => {
+                    const vData = snap.val() || {};
+                    const myVids = Object.values(vData).filter(v => v.authorUid === uid);
+                    lvlVideosCount = myVids.length;
+                    lvlLikesCount = myVids.reduce((sum, v) => sum + Object.keys(v.likes || {}).length, 0);
+                    renderLevel();
+                });
+            });
+        }
+
+        initLevelSystem();
+
+        // ==================== ДОПОЛНИТЕЛЬНЫЕ ДОСТИЖЕНИЯ ====================
+
+        let extraProfileData = {};
+
+        function initExtraAchievementsData() {
+            auth.onAuthStateChanged((user) => {
+                if (!user) return;
+                db.ref('users/' + user.uid).on('value', (snap) => {
+                    extraProfileData = snap.val() || {};
+                    renderExtraAchievements();
+                });
+            });
+        }
+
+        function computeMyLeaderboardRank() {
+            const user = auth.currentUser;
+            if (!user) return null;
+
+            const scores = {};
+            Object.keys(lbUsersCache).forEach(uid => { scores[uid] = 0; });
+            Object.values(lbGamesCache).forEach(g => { if (scores[g.authorUid] !== undefined) scores[g.authorUid] += 3; });
+            Object.values(lbVideosCache).forEach(v => {
+                if (scores[v.authorUid] !== undefined) {
+                    scores[v.authorUid] += 2;
+                    scores[v.authorUid] += Object.keys(v.likes || {}).length;
+                }
+            });
+
+            const ranked = Object.entries(scores).filter(([, s]) => s > 0).sort((a, b) => b[1] - a[1]);
+            const idx = ranked.findIndex(([uid]) => uid === user.uid);
+            return idx === -1 ? null : idx + 1;
+        }
+
+        function renderExtraAchievements() {
+            const box = document.getElementById('profile-achievements-extra');
+            if (!box) return;
+
+            const d = extraProfileData;
+            const bioFilled = (d.bio || '').trim().length > 15;
+            const rank = computeMyLeaderboardRank();
+            const level = currentLevel();
+            const fullProfile = !!(d.avatar && d.banner && bioFilled && d.socialDiscord && d.socialWebsite);
+
+            const extras = [
+                { icon: '🖼️', label: 'Аватар установлен', unlocked: !!d.avatar },
+                { icon: '🎨', label: 'Баннер установлен', unlocked: !!d.banner },
+                { icon: '📝', label: 'Био заполнено', unlocked: bioFilled },
+                { icon: '💬', label: 'Discord указан', unlocked: !!d.socialDiscord },
+                { icon: '🔗', label: 'Сайт указан', unlocked: !!d.socialWebsite },
+                { icon: '🎯', label: 'Полностью заполненный профиль', unlocked: fullProfile },
+                { icon: '☑️', label: 'Подтверждённый аккаунт', unlocked: !!d.isVerified },
+                { icon: '👑', label: 'DEV статус', unlocked: !!d.isDevBadge },
+                { icon: '⚙️', label: 'Администратор', unlocked: !!d.isAdmin },
+                { icon: '🧩', label: 'Мультитворец (игра + видео)', unlocked: myGamesCountVal >= 1 && myVideosCountVal >= 1 },
+                { icon: '🏛️', label: 'Мастер игр (10+ игр)', unlocked: myGamesCountVal >= 10 },
+                { icon: '🎥', label: 'Кинопродюсер (15+ видео)', unlocked: myVideosCountVal >= 15 },
+                { icon: '💯', label: '100+ лайков', unlocked: myLikesReceivedVal >= 100 },
+                { icon: '🥉', label: 'Топ-3 сайта', unlocked: rank !== null && rank <= 3 },
+                { icon: '🌟', label: '5 уровень', unlocked: level >= 5 },
+                { icon: '🚀', label: '10 уровень', unlocked: level >= 10 },
+                { icon: '🏆', label: '20 уровень', unlocked: level >= 20 },
+                { icon: '📅', label: 'Добро пожаловать', unlocked: !!d.joinedAt }
+            ];
+
+            box.innerHTML = extras.map(a => `
+                <div class="achievement-badge ${a.unlocked ? '' : 'locked'}" title="${escapeHtml(a.label)}">
+                    <span>${a.icon}</span>
+                    <span>${escapeHtml(a.label)}</span>
+                </div>
+            `).join('');
+        }
+
+        initExtraAchievementsData();
+
+        // ==================== ПРОГРЕСС ДОСТИЖЕНИЙ + УВЕДОМЛЕНИЯ О РАЗБЛОКИРОВКЕ ====================
+
+        let previouslyUnlockedTitles = new Set();
+        let achievementsFirstRun = true;
+
+        function updateAchievementsProgress() {
+            const el = document.getElementById('achievements-progress');
+            if (!el) return;
+
+            const badges = document.querySelectorAll('#profile-achievements .achievement-badge, #profile-achievements-extra .achievement-badge');
+            const total = badges.length;
+            if (total === 0) { el.innerText = ''; return; }
+
+            let unlocked = 0;
+            const currentTitles = new Set();
+            badges.forEach(b => {
+                if (!b.classList.contains('locked')) {
+                    unlocked++;
+                    currentTitles.add(b.getAttribute('title'));
+                }
+            });
+
+            const pct = Math.round((unlocked / total) * 100);
+            el.innerText = `Разблокировано: ${unlocked} / ${total} (${pct}%)`;
+
+            if (!achievementsFirstRun) {
+                currentTitles.forEach(t => {
+                    if (!previouslyUnlockedTitles.has(t)) {
+                        showToast('🎉 Новое достижение: ' + t, 'success');
+                    }
+                });
+            }
+            achievementsFirstRun = false;
+            previouslyUnlockedTitles = currentTitles;
+        }
+
+        function observeAchievements() {
+            const c1 = document.getElementById('profile-achievements');
+            const c2 = document.getElementById('profile-achievements-extra');
+            const cb = () => updateAchievementsProgress();
+            if (c1) new MutationObserver(cb).observe(c1, { childList: true });
+            if (c2) new MutationObserver(cb).observe(c2, { childList: true });
+        }
+
+        observeAchievements();
+
+        // ==================== ПОДЕЛИТЬСЯ ПРОФИЛЕМ ====================
+
+        function shareProfile() {
+            const user = auth.currentUser;
+            if (!user) return;
+
+            const name = document.getElementById('view-username') ? document.getElementById('view-username').innerText : 'Игрок';
+            const level = currentLevel();
+            const text = `🍓 ${name} на Godot Dev Hub — уровень ${level}, ${myGamesCountVal} игр, ${myVideosCountVal} видео, ${myLikesReceivedVal} лайков!`;
+
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text).then(() => {
+                    showToast('Скопировано в буфер обмена!', 'success');
+                }).catch(() => {
+                    showToast('Не удалось скопировать', 'error');
+                });
+            } else {
+                showToast('Копирование не поддерживается браузером', 'error');
+            }
+        }
+
+        // ==================== ЗАБЫЛИ ПАРОЛЬ ====================
+
+        function handleForgotPassword() {
+            const email = document.getElementById('login-email').value.trim();
+            if (!email) return showToast('Введите email в поле выше, затем нажмите "Забыли пароль?"', 'error');
+
+            auth.sendPasswordResetEmail(email)
+                .then(() => showToast('Письмо для сброса пароля отправлено!', 'success'))
+                .catch(err => showToast('Ошибка: ' + err.message, 'error'));
+        }
+
+        // ==================== ПОИСК: ОЧИСТКА ====================
+
+        function clearGameSearch() {
+            const input = document.getElementById('search-game-input');
+            input.value = '';
+            filterGames();
+            document.getElementById('search-clear-btn').style.display = 'none';
+        }
+
+        (function watchSearchClearBtn() {
+            const input = document.getElementById('search-game-input');
+            const clearBtn = document.getElementById('search-clear-btn');
+            if (!input || !clearBtn) return;
+            input.addEventListener('input', () => {
+                clearBtn.style.display = input.value ? 'inline-block' : 'none';
+            });
+        })();
+
+        // ==================== СКРОЛЛ НАВЕРХ ====================
+
+        window.addEventListener('scroll', () => {
+            const btn = document.getElementById('scroll-top-btn');
+            if (!btn) return;
+            btn.style.display = window.scrollY > 400 ? 'flex' : 'none';
+        });
+
+        // ==================== СЧЁТЧИК ИГР В ШАПКЕ + СТАТИСТИКА САЙТА ====================
+
+        let swUsersCount = 0;
+        let swGamesData = {};
+        let swVideosData = {};
+
+        function renderSiteWideStats() {
+            const gCount = Object.keys(swGamesData).length;
+            const vCount = Object.keys(swVideosData).length;
+
+            const counterEl = document.getElementById('header-games-counter');
+            if (counterEl) {
+                counterEl.innerText = `🎮 ${gCount} игр на сайте`;
+                counterEl.style.display = 'inline-block';
+            }
+
+            const bar = document.getElementById('site-stats-bar');
+            if (bar) {
+                bar.innerHTML = `
+                    <span>👥 Пользователей: <b style="color:#fff;">${swUsersCount}</b></span>
+                    <span>🎮 Игр: <b style="color:#fff;">${gCount}</b></span>
+                    <span>🎬 Видео: <b style="color:#fff;">${vCount}</b></span>
+                `;
+            }
+
+            renderGameOfDay(swGamesData);
+            prepareRandomGamePool(swGamesData);
+            renderTopVideos(swVideosData);
+        }
+
+        function initSiteWideStats() {
+            db.ref('users').on('value', snap => {
+                swUsersCount = snap.numChildren();
+                renderSiteWideStats();
+            });
+            db.ref('games').on('value', snap => {
+                swGamesData = snap.val() || {};
+                renderSiteWideStats();
+            });
+            db.ref('videos').on('value', snap => {
+                swVideosData = snap.val() || {};
+                renderSiteWideStats();
+            });
+        }
+
+        initSiteWideStats();
+
+        // ==================== ИГРА ДНЯ ====================
+
+        let randomGamePool = [];
+
+        function renderGameOfDay(gamesData) {
+            const box = document.getElementById('game-of-day-box');
+            if (!box) return;
+
+            const keys = Object.keys(gamesData);
+            if (keys.length === 0) {
+                box.innerHTML = '<p style="color:var(--text-muted); font-size:0.85rem; margin:0;">Пока нет игр для выбора.</p>';
+                return;
+            }
+
+            const dayHash = new Date().toISOString().slice(0, 10).split('-').join('');
+            const idx = parseInt(dayHash, 10) % keys.length;
+            const game = gamesData[keys[idx]];
+
+            box.innerHTML = `
+                <div class="game-of-day-box">
+                    <img src="${game.cover ? escapeHtml(game.cover) : 'https://via.placeholder.com/56'}" class="game-of-day-cover">
+                    <div style="flex:1;">
+                        <div style="color:#fff; font-weight:700; font-size:0.9rem;">${escapeHtml(game.title)}</div>
+                        <div style="color:var(--text-muted); font-size:0.75rem;">Автор: ${escapeHtml(game.author)}</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function prepareRandomGamePool(gamesData) {
+            randomGamePool = Object.values(gamesData);
+        }
+
+        function goToRandomGame() {
+            if (randomGamePool.length === 0) return showToast('Нет доступных игр', 'error');
+            const game = randomGamePool[Math.floor(Math.random() * randomGamePool.length)];
+            const input = document.getElementById('search-game-input');
+            if (input) {
+                input.value = game.title;
+                filterGames();
+                document.getElementById('search-clear-btn').style.display = 'inline-block';
+            }
+            showToast('🎲 Случайная игра: ' + game.title, 'info');
+        }
+
+        // ==================== ТОП ВИДЕО ====================
+
+        function renderTopVideos(videosData) {
+            const box = document.getElementById('top-videos-list');
+            if (!box) return;
+
+            const list = Object.values(videosData).map(v => ({
+                caption: v.caption || 'Без подписи',
+                author: v.author || 'Godot Dev',
+                likes: Object.keys(v.likes || {}).length
+            })).filter(v => v.likes > 0).sort((a, b) => b.likes - a.likes).slice(0, 3);
+
+            if (list.length === 0) {
+                box.innerHTML = '<p style="color:var(--text-muted); font-size:0.85rem; margin:0;">Пока нет залайканных видео.</p>';
+                return;
+            }
+
+            const medals = ['🥇', '🥈', '🥉'];
+            box.innerHTML = list.map((v, i) => `
+                <div class="leaderboard-row">
+                    <span class="leaderboard-rank">${medals[i]}</span>
+                    <div class="leaderboard-name">${escapeHtml(v.caption)} <span style="color:var(--text-muted); font-weight:400;">— ${escapeHtml(v.author)}</span></div>
+                    <span class="leaderboard-score">❤️ ${v.likes}</span>
+                </div>
+            `).join('');
+        }
+
+        // ==================== ПРИВЕТСТВИЕ НОВОГО ПОЛЬЗОВАТЕЛЯ ====================
+
+        let welcomeCheckDone = false;
+        auth.onAuthStateChanged((user) => {
+            if (!user || welcomeCheckDone) return;
+            welcomeCheckDone = true;
+
+            db.ref('users/' + user.uid).once('value').then(snap => {
+                const data = snap.val() || {};
+                if (data.joinedAt && (Date.now() - data.joinedAt) < 15000) {
+                    showToast('🎉 Добро пожаловать в Godot Dev Hub!', 'success');
+                }
+            });
+        });
     </script>
 </body>
 </html>
