@@ -23,10 +23,13 @@ const profileBtn = document.getElementById('profileBtn');
 const profileModal = document.getElementById('profileModal');
 const closeProfile = document.getElementById('closeProfile');
 const followBtn = document.getElementById('followBtn');
+const editProfileBtn = document.getElementById('editProfileBtn');
+const editForm = document.getElementById('editForm');
+const saveProfileBtn = document.getElementById('saveProfileBtn');
 
 let currentViewedUserId = null;
 
-// Аутентификация
+// Логин
 loginBtn.onclick = async () => {
   const email = document.getElementById('authEmail').value;
   const password = document.getElementById('authPassword').value;
@@ -39,13 +42,13 @@ loginBtn.onclick = async () => {
 
 logoutBtn.onclick = () => signOut(auth);
 
+// Отслеживание состояния входа
 onAuthStateChanged(auth, async (user) => {
   if (user) {
     loginBtn.classList.add('hidden');
     logoutBtn.classList.remove('hidden');
     profileBtn.classList.remove('hidden');
     
-    // Инициализация данных профиля текущего пользователя
     const userRef = doc(db, "users", user.uid);
     const userSnap = await getDoc(userRef);
     if (!userSnap.exists()) {
@@ -63,37 +66,58 @@ onAuthStateChanged(auth, async (user) => {
   }
 });
 
-// Модальное окно профиля
+// Модальное окно
 profileBtn.onclick = () => openProfile(auth.currentUser.uid);
 closeProfile.onclick = () => profileModal.classList.add('hidden');
 
 async function openProfile(userId) {
   currentViewedUserId = userId;
   profileModal.classList.remove('hidden');
+  editForm.classList.add('hidden');
   
   const userRef = doc(db, "users", userId);
   const userSnap = await getDoc(userRef);
   
   if (userSnap.exists()) {
     const data = userSnap.data();
-    document.getElementById('profileUsername').innerText = data.email.split('@')[0];
-    document.getElementById('profileEmailText').innerText = data.email;
+    document.getElementById('profileUsername').innerText = data.email ? data.email.split('@')[0] : 'User';
+    document.getElementById('profileBio').innerText = data.bio || 'Описание профиля отсутствует...';
+    document.getElementById('profileAvatar').src = data.avatarUrl || 'https://via.placeholder.com/100';
+    
     document.getElementById('followersCount').innerText = data.followers ? data.followers.length : 0;
     document.getElementById('followingCount').innerText = data.following ? data.following.length : 0;
     document.getElementById('likesCount').innerText = data.likes || 0;
 
-    // Настройка кнопки Подписаться
-    if (auth.currentUser && auth.currentUser.uid !== userId) {
+    if (auth.currentUser && auth.currentUser.uid === userId) {
+      editProfileBtn.classList.remove('hidden');
+      followBtn.classList.add('hidden');
+    } else if (auth.currentUser) {
+      editProfileBtn.classList.add('hidden');
       followBtn.classList.remove('hidden');
       const isFollowing = data.followers && data.followers.includes(auth.currentUser.uid);
       followBtn.innerText = isFollowing ? "Отписаться" : "Подписаться";
-    } else {
-      followBtn.classList.add('hidden');
     }
   }
 }
 
-// Логика подписки
+// Редактирование
+editProfileBtn.onclick = () => editForm.classList.toggle('hidden');
+
+saveProfileBtn.onclick = async () => {
+  if (!auth.currentUser) return;
+  const avatarUrl = document.getElementById('editAvatarUrl').value;
+  const bio = document.getElementById('editBioInput').value;
+  
+  const userRef = doc(db, "users", auth.currentUser.uid);
+  await updateDoc(userRef, {
+    ...(avatarUrl && { avatarUrl }),
+    ...(bio && { bio })
+  });
+  
+  openProfile(auth.currentUser.uid);
+};
+
+// Подписка
 followBtn.onclick = async () => {
   if (!auth.currentUser) return alert("Сначала войдите в аккаунт");
   
@@ -114,7 +138,7 @@ followBtn.onclick = async () => {
   openProfile(currentViewedUserId);
 };
 
-// Загрузка видео
+// Загрузка ленты
 async function loadVideos() {
   try {
     const querySnapshot = await getDocs(collection(db, "videos"));
