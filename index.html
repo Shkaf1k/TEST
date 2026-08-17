@@ -2030,11 +2030,11 @@
 
             const videoFile = document.getElementById('video-file-input').files[0];
             const caption = document.getElementById('video-caption-input').value.trim();
-
+             
             if (!videoFile) return showToast("Выберите видеофайл!", "error");
             if (!videoFile.type.startsWith('video/')) return showToast("Файл должен быть видео!", "error");
-            if (videoFile.size > 25 * 1024 * 1024) return showToast("Видео слишком большое (макс. 25MB)!", "error");
-
+            if (videoFile.size > 500 * 1920 * 1080) return showToast("Видео слишком большое (макс. 25MB)!", "error"); #ХУЙНЯОСУКАНАХУЙБЛЯДЬ
+                       
             const pubBtn = document.getElementById('video-pub-btn');
             pubBtn.innerText = "Загрузка...";
 
