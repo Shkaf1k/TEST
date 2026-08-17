@@ -968,6 +968,84 @@
             flex-shrink: 0;
         }
 
+        /* --- SCREENSHOTS --- */
+        .game-screenshots-strip {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            margin-bottom: 12px;
+            padding-bottom: 4px;
+        }
+
+        .game-screenshot-thumb {
+            width: 90px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 1px solid var(--card-border);
+            flex-shrink: 0;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .game-screenshot-thumb:hover { transform: scale(1.05); }
+
+        select#screenshot-game-select {
+            width: 100%;
+            padding: 11px 14px;
+            margin-bottom: 16px;
+            border-radius: 8px;
+            border: 1px solid var(--card-border);
+            background: rgba(13, 14, 18, 0.6);
+            color: #fff;
+            outline: none;
+            font-family: inherit;
+            font-size: 0.9rem;
+        }
+
+        /* --- FOLLOW SYSTEM --- */
+        .follow-btn {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid var(--card-border);
+            color: #fff;
+            font-size: 0.68rem;
+            font-weight: 700;
+            padding: 5px 10px;
+            border-radius: 14px;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s;
+        }
+        .follow-btn:hover { background: rgba(255, 255, 255, 0.15); }
+        .follow-btn.following {
+            background: rgba(255, 59, 92, 0.2);
+            border-color: rgba(255, 59, 92, 0.4);
+            color: var(--accent-red);
+        }
+
+        .vidfeed-filter-btn {
+            background: rgba(20, 20, 24, 0.6);
+            border: 1px solid rgba(255,255,255,0.15);
+            color: #fff;
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            cursor: pointer;
+            backdrop-filter: blur(6px);
+            transition: all 0.25s ease;
+        }
+        .vidfeed-filter-btn.active {
+            background: rgba(255, 59, 92, 0.3);
+            border-color: rgba(255, 59, 92, 0.5);
+        }
+
+        .vidfeed-view-count {
+            font-size: 0.72rem;
+            color: rgba(255,255,255,0.75);
+            text-shadow: 0 1px 4px rgba(0,0,0,0.8);
+            margin-top: 4px;
+        }
+
         /* MOBILE RESPONSIVE */
         @media (max-width: 600px) {
             header { justify-content: center; padding: 10px 8px; }
@@ -1159,6 +1237,19 @@
 
                 <button class="btn-primary" id="pub-btn" onclick="publishGame()">Загрузить игру</button>
             </div>
+
+            <div class="card-panel">
+                <h3 style="color: #fff; margin-top: 0; font-size: 0.95rem; margin-bottom: 16px;">📸 Скриншоты к игре</h3>
+                <p style="color:var(--text-muted); font-size:0.78rem; margin-top:-10px;">Сначала опубликуйте игру выше, затем выберите её здесь и добавьте скриншоты.</p>
+
+                <label>Ваша игра:</label>
+                <select id="screenshot-game-select"><option value="">Загрузка...</option></select>
+
+                <label>Скриншоты (можно выбрать несколько):</label>
+                <input type="file" id="screenshot-files-input" accept="image/*" multiple>
+
+                <button class="btn-primary" id="screenshot-save-btn" onclick="uploadScreenshots()">Сохранить скриншоты</button>
+            </div>
         </section>
 
         <!-- Вкладка 3: Профиль -->
@@ -1214,6 +1305,21 @@
                         <div class="stat-value" id="stat-my-likes">0</div>
                         <div class="stat-label">Лайков</div>
                     </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="stat-my-followers">0</div>
+                        <div class="stat-label">Подписчиков</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="stat-my-following">0</div>
+                        <div class="stat-label">Подписок</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-panel">
+                <h3 style="color: #fff; margin-top: 0; font-size: 0.95rem; margin-bottom: 16px;">👥 Мои подписки</h3>
+                <div id="my-following-list" style="display:flex; flex-direction:column; gap:10px;">
+                    <p style="color:var(--text-muted); font-size:0.85rem; margin:0;">Вы пока ни на кого не подписаны.</p>
                 </div>
             </div>
 
@@ -1315,6 +1421,7 @@
         <section id="section-vidfeed" style="display: none;">
             <div class="vidfeed-top-bar">
                 <button class="vidfeed-back-btn" onclick="showTab('feed')">← Назад</button>
+                <button class="vidfeed-filter-btn" id="vidfeed-filter-btn" onclick="toggleFollowFilter()">👥 Только подписки</button>
                 <button class="vidfeed-upload-btn" onclick="openVideoUploadModal()">⬆ Загрузить видео</button>
             </div>
             <div class="vidfeed-scroller" id="vidfeed-scroller">
@@ -1967,13 +2074,20 @@
             const currentUser = auth.currentUser;
             const scrollPos = scroller.scrollTop;
 
-            const keys = Object.keys(allVideosData).reverse();
+            let keys = Object.keys(allVideosData).reverse();
+
+            if (typeof showFollowedOnly !== 'undefined' && showFollowedOnly) {
+                keys = keys.filter(k => myFollowingSet.has(allVideosData[k].authorUid));
+            }
 
             if (keys.length === 0) {
+                const emptyMsg = (typeof showFollowedOnly !== 'undefined' && showFollowedOnly)
+                    ? 'Вы пока не подписаны ни на кого с видео 👥'
+                    : 'Пока нет видео 🎬';
                 scroller.innerHTML = `
                     <div class="vidfeed-slide">
                         <div class="vidfeed-empty">
-                            <p class="vidfeed-empty-title">Пока нет видео 🎬</p>
+                            <p class="vidfeed-empty-title">${emptyMsg}</p>
                             <p style="font-size:0.85rem;">Нажмите «Загрузить видео», чтобы опубликовать первое!</p>
                         </div>
                     </div>
@@ -1988,6 +2102,7 @@
                 const likesObj = v.likes || {};
                 const likeCount = Object.keys(likesObj).length;
                 const iLiked = currentUser ? !!likesObj[currentUser.uid] : false;
+                const viewCount = v.views || 0;
 
                 const bInfo = userBadgesMap[v.authorUid] || {};
                 const verifiedHtml = bInfo.verified ? '<span class="verified-badge" title="Подтверждён">☑️</span>' : '';
@@ -1998,13 +2113,19 @@
                     ? `<button class="vidfeed-action-btn" onclick="deleteVideo('${vidId}')" title="Удалить">🗑️</button>`
                     : '';
 
+                const showFollowBtn = currentUser && v.authorUid && v.authorUid !== currentUser.uid;
+                const followBtnHtml = showFollowBtn
+                    ? `<button class="follow-btn ${isFollowing(v.authorUid) ? 'following' : ''}" onclick="toggleFollow('${v.authorUid}')">${isFollowing(v.authorUid) ? '✓ Подписан' : '+ Подписаться'}</button>`
+                    : '';
+
                 const slide = document.createElement('div');
                 slide.className = 'vidfeed-slide';
                 slide.innerHTML = `
-                    <video class="vidfeed-video" src="${escapeHtml(v.video)}" loop muted playsinline preload="metadata" onclick="toggleVideoPlayback(this)"></video>
+                    <video class="vidfeed-video" src="${escapeHtml(v.video)}" loop muted playsinline preload="metadata" onclick="toggleVideoPlayback(this)" onplay="registerVideoView('${vidId}')"></video>
                     <div class="vidfeed-info">
-                        <div class="vidfeed-author">${escapeHtml(v.author)} ${verifiedHtml} ${devHtml}</div>
+                        <div class="vidfeed-author">${escapeHtml(v.author)} ${verifiedHtml} ${devHtml} ${followBtnHtml}</div>
                         <div class="vidfeed-caption">${escapeHtml(v.caption || '')}</div>
+                        <div class="vidfeed-view-count">👁️ ${viewCount} просмотров</div>
                     </div>
                     <div class="vidfeed-side-actions">
                         <div style="display:flex; flex-direction:column; align-items:center;">
@@ -2191,6 +2312,7 @@
             const scores = {};
             Object.entries(lbUsersCache).forEach(([uid, u]) => {
                 scores[uid] = {
+                    uid: uid,
                     name: u.username || 'Игрок',
                     avatar: u.avatar || '',
                     verified: !!u.isVerified,
@@ -2236,6 +2358,7 @@
                         ${s.dev ? '<span class="dev-badge">👑</span>' : ''}
                     </div>
                     <span class="leaderboard-score">${s.score} очк.</span>
+                    ${(auth.currentUser && s.uid !== auth.currentUser.uid) ? `<button class="follow-btn ${isFollowing(s.uid) ? 'following' : ''}" onclick="toggleFollow('${s.uid}')">${isFollowing(s.uid) ? '✓' : '+'}</button>` : ''}
                 </div>
             `).join('');
         }
@@ -2635,6 +2758,189 @@
                 }
             });
         });
+
+        // ==================== ПОДПИСКИ (FOLLOW SYSTEM, как в TikTok) ====================
+
+        let followsCache = {};
+        let myFollowingSet = new Set();
+        let showFollowedOnly = false;
+
+        function toggleFollow(targetUid) {
+            const user = auth.currentUser;
+            if (!user || !targetUid || user.uid === targetUid) return;
+
+            const ref = db.ref('follows/' + user.uid + '/' + targetUid);
+            ref.once('value').then(snap => {
+                if (snap.val()) {
+                    ref.remove();
+                } else {
+                    ref.set(true);
+                    showToast('Вы подписались!', 'success');
+                }
+            });
+        }
+
+        function isFollowing(targetUid) {
+            return myFollowingSet.has(targetUid);
+        }
+
+        function renderMyFollowingList() {
+            const box = document.getElementById('my-following-list');
+            const user = auth.currentUser;
+            if (!box || !user) return;
+
+            const ids = Array.from(myFollowingSet);
+            if (ids.length === 0) {
+                box.innerHTML = '<p style="color:var(--text-muted); font-size:0.85rem; margin:0;">Вы пока ни на кого не подписаны.</p>';
+                return;
+            }
+
+            box.innerHTML = ids.map(uid => {
+                const u = lbUsersCache[uid] || {};
+                return `
+                    <div class="leaderboard-row">
+                        <img src="${escapeHtml(u.avatar || 'https://via.placeholder.com/32')}" class="leaderboard-avatar">
+                        <div class="leaderboard-name">${escapeHtml(u.username || 'Пользователь')}</div>
+                        <button class="follow-btn following" onclick="toggleFollow('${uid}')">Отписаться</button>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function updateFollowStats() {
+            const user = auth.currentUser;
+            if (!user) return;
+
+            const followingCount = myFollowingSet.size;
+            let followerCount = 0;
+            Object.values(followsCache).forEach(followingMap => {
+                if (followingMap && followingMap[user.uid]) followerCount++;
+            });
+
+            const elFollowers = document.getElementById('stat-my-followers');
+            const elFollowing = document.getElementById('stat-my-following');
+            if (elFollowers) elFollowers.innerText = followerCount;
+            if (elFollowing) elFollowing.innerText = followingCount;
+
+            renderMyFollowingList();
+        }
+
+        function initFollowSystem() {
+            auth.onAuthStateChanged((user) => {
+                if (!user) return;
+
+                db.ref('follows').on('value', snap => {
+                    followsCache = snap.val() || {};
+                    myFollowingSet = new Set(Object.keys(followsCache[user.uid] || {}));
+                    updateFollowStats();
+                    if (typeof renderVideoFeed === 'function' && document.getElementById('section-vidfeed').style.display !== 'none') {
+                        renderVideoFeed();
+                    }
+                });
+            });
+        }
+
+        initFollowSystem();
+
+        function toggleFollowFilter() {
+            showFollowedOnly = !showFollowedOnly;
+            const btn = document.getElementById('vidfeed-filter-btn');
+            if (btn) btn.classList.toggle('active', showFollowedOnly);
+            renderVideoFeed();
+        }
+
+        // ==================== СКРИНШОТЫ К ИГРАМ ====================
+
+        let gameScreenshotsCache = {};
+
+        function extractGameIdFromCard(cardEl) {
+            const delBtn = cardEl.querySelector('[onclick^="deleteGame("]');
+            if (!delBtn) return null;
+            const m = delBtn.getAttribute('onclick').match(/deleteGame\('([^']+)'\)/);
+            return m ? m[1] : null;
+        }
+
+        function injectScreenshotsIntoCards() {
+            document.querySelectorAll('#games-container .game-card').forEach(card => {
+                const existing = card.querySelector('.game-screenshots-strip');
+                if (existing) existing.remove();
+
+                const gid = extractGameIdFromCard(card);
+                if (!gid) return;
+                const shots = gameScreenshotsCache[gid];
+                if (!shots || shots.length === 0) return;
+
+                const strip = document.createElement('div');
+                strip.className = 'game-screenshots-strip';
+                strip.innerHTML = shots.map(s => `<img src="${escapeHtml(s)}" class="game-screenshot-thumb" onclick="window.open(this.src, '_blank')">`).join('');
+
+                const titleEl = card.querySelector('.game-title');
+                if (titleEl) titleEl.insertAdjacentElement('afterend', strip);
+            });
+        }
+
+        function loadMyGamesForScreenshots() {
+            auth.onAuthStateChanged(user => {
+                if (!user) return;
+                db.ref('games').on('value', snap => {
+                    const data = snap.val() || {};
+                    const mine = Object.entries(data).filter(([, g]) => g.authorUid === user.uid);
+                    const sel = document.getElementById('screenshot-game-select');
+                    if (!sel) return;
+                    sel.innerHTML = mine.length
+                        ? mine.map(([id, g]) => `<option value="${id}">${escapeHtml(g.title)}</option>`).join('')
+                        : '<option value="">Сначала опубликуйте игру</option>';
+                });
+            });
+        }
+
+        async function uploadScreenshots() {
+            const gameId = document.getElementById('screenshot-game-select').value;
+            if (!gameId) return showToast('Выберите игру!', 'error');
+
+            const files = document.getElementById('screenshot-files-input').files;
+            if (!files || files.length === 0) return showToast('Выберите файлы!', 'error');
+
+            const btn = document.getElementById('screenshot-save-btn');
+            btn.innerText = 'Сохранение...';
+
+            try {
+                const arr = [];
+                for (const f of files) arr.push(await fileToBase64(f));
+                await db.ref('gameScreenshots/' + gameId).set(arr);
+                showToast('Скриншоты сохранены!', 'success');
+                document.getElementById('screenshot-files-input').value = '';
+            } catch (err) {
+                showToast('Ошибка: ' + err.message, 'error');
+            }
+            btn.innerText = 'Сохранить скриншоты';
+        }
+
+        function initScreenshots() {
+            db.ref('gameScreenshots').on('value', snap => {
+                gameScreenshotsCache = snap.val() || {};
+                injectScreenshotsIntoCards();
+            });
+
+            const container = document.getElementById('games-container');
+            if (container) {
+                new MutationObserver(() => injectScreenshotsIntoCards()).observe(container, { childList: true });
+            }
+
+            loadMyGamesForScreenshots();
+        }
+
+        initScreenshots();
+
+        // ==================== ПРОСМОТРЫ ВИДЕО ====================
+
+        let viewedVideosThisSession = new Set();
+
+        function registerVideoView(vidId) {
+            if (viewedVideosThisSession.has(vidId)) return;
+            viewedVideosThisSession.add(vidId);
+            db.ref('videos/' + vidId + '/views').transaction(v => (v || 0) + 1);
+        }
     </script>
 </body>
 </html>
