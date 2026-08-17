@@ -3,42 +3,27 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TikTok Clone</title>
+  <title>Мои Проекты</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <!-- Шапка с кнопками профиля -->
-  <header class="navbar">
-    <span class="logo">TikTok</span>
-    <div id="authButtons">
-      <button id="showAuthBtn">Войти</button>
-    </div>
-  </header>
+  <h1 class="page-title">МОИ ВИДЕО</h1>
 
-  <!-- Лента видео -->
-  <main class="app__videos" id="videoContainer"></main>
-
-  <!-- Окно авторизации / регистрации -->
-  <div class="modal hidden" id="authModal">
-    <div class="modal-content">
-      <span class="close-btn" id="closeAuth">&times;</span>
-      <h2 id="modalTitle">Вход</h2>
-      <input type="email" id="authEmail" placeholder="Email" required>
-      <input type="password" id="authPassword" placeholder="Пароль" required>
-      <button id="authSubmitBtn">Войти</button>
-      <p class="toggle-auth" id="toggleAuthText">Нет аккаунта? Зарегистрироваться</p>
+  <div class="card-container" id="videoContainer">
+    <div class="card">
+      <h2 class="card-title">Загрузка...</h2>
+      <p class="card-description">Подключение к Firebase...</p>
+      <a href="#" class="card-link">Смотреть</a>
     </div>
   </div>
 
-  <!-- Модальное окно профиля -->
-  <div class="modal hidden" id="profileModal">
-    <div class="modal-content">
-      <span class="close-btn" id="closeProfile">&times;</span>
-      <h2>Профиль</h2>
-      <p id="profileEmail"></p>
-      <button id="logoutBtn" class="logout-btn">Выйти</button>
-    </div>
+  <!-- Окно входа/регистрации -->
+  <div class="auth-box">
+    <input type="email" id="authEmail" placeholder="Email">
+    <input type="password" id="authPassword" placeholder="Пароль">
+    <button id="loginBtn">Войти</button>
+    <button id="logoutBtn" class="hidden">Выйти</button>
   </div>
 
   <script type="module" src="app.js"></script>
