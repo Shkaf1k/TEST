@@ -2,95 +2,134 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
 body {
-  background-color: #0d0d0d;
+  background-color: #121212;
   color: #ffffff;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
   min-height: 100vh;
-  padding: 20px;
 }
 
-.page-title {
-  font-size: 20px;
-  font-weight: 700;
-  letter-spacing: 2px;
-  margin-bottom: 30px;
-  text-transform: uppercase;
-}
-
-.card-container {
+/* Навигация */
+.navbar {
   width: 100%;
-  max-width: 500px;
+  max-width: 1000px;
   display: flex;
-  flex-direction: column;
-  gap: 20px;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+  background-color: #1e1e1e;
+  border-bottom: 1px solid #2d2d2d;
+  position: sticky;
+  top: 0;
+  z-index: 100;
 }
 
-.card {
-  background-color: #171717;
-  border: 1px solid #262626;
-  padding: 30px 20px;
-  text-align: center;
-  border-radius: 4px;
+.logo {
+  font-size: 22px;
+  font-weight: 800;
+  background: linear-gradient(45deg, #00f2fe, #4facfe, #ff0844);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
-.card-title {
-  font-size: 18px;
+.auth-bar {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.auth-bar input {
+  background: #2a2a2a;
+  border: 1px solid #3d3d3d;
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 14px;
+  outline: none;
+}
+
+.auth-bar input:focus {
+  border-color: #fe2c55;
+}
+
+.btn {
+  padding: 8px 16px;
+  border-radius: 6px;
+  border: none;
   font-weight: 600;
-  margin-bottom: 12px;
-}
-
-.card-description {
-  font-size: 13px;
-  color: #a3a3a3;
-  margin-bottom: 20px;
-  line-height: 1.4;
-}
-
-.card-link {
-  color: #ff334b;
-  text-decoration: none;
-  font-size: 13px;
-  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
   transition: opacity 0.2s;
 }
 
-.card-link:hover {
-  opacity: 0.8;
+.btn:hover {
+  opacity: 0.85;
 }
 
-.auth-box {
-  margin-top: 40px;
+.btn-primary {
+  background-color: #fe2c55;
+  color: #ffffff;
+}
+
+.btn-secondary {
+  background-color: #333333;
+  color: #ffffff;
+}
+
+/* Лента */
+.feed {
+  width: 100%;
+  max-width: 400px;
+  margin: 20px 0;
   display: flex;
-  gap: 10px;
+  flex-direction: column;
+  gap: 24px;
 }
 
-.auth-box input {
-  background: #171717;
-  border: 1px solid #262626;
-  color: #fff;
-  padding: 8px 12px;
-  border-radius: 4px;
-  font-size: 13px;
+.video-card {
+  background-color: #1e1e1e;
+  border: 1px solid #2d2d2d;
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
-.auth-box button {
-  background: #ffffff;
-  color: #000000;
-  border: none;
-  padding: 8px 16px;
-  border-radius: 4px;
+.video-player {
+  width: 100%;
+  height: 500px;
+  object-fit: cover;
+  background-color: #000000;
+}
+
+.card-info {
+  padding: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.card-title {
+  font-size: 15px;
   font-weight: 600;
+  color: #e1e1e1;
+}
+
+.like-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: #fff;
+  padding: 6px 12px;
+  border-radius: 20px;
   cursor: pointer;
   font-size: 13px;
 }
 
 .hidden {
-  display: none;
+  display: none !important;
 }
