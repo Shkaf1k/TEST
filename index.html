@@ -8,6 +8,7 @@
 </head>
 <body>
 
+  <!-- Навигационная панель -->
   <header class="navbar">
     <div class="logo">TokTok</div>
     <div class="auth-bar">
@@ -23,8 +24,12 @@
   <div id="profileModal" class="modal hidden">
     <div class="modal-content">
       <span id="closeProfile" class="close">&times;</span>
-      <h2 id="profileUsername">Имя пользователя</h2>
-      <p id="profileEmailText" class="profile-email"></p>
+      
+      <div class="profile-header">
+        <img id="profileAvatar" src="https://via.placeholder.com/100" class="profile-avatar" alt="Avatar">
+        <h2 id="profileUsername">Имя пользователя</h2>
+        <p id="profileBio" class="profile-bio">Описание профиля отсутствует...</p>
+      </div>
       
       <div class="profile-stats">
         <div class="stat-item">
@@ -41,10 +46,19 @@
         </div>
       </div>
 
+      <button id="editProfileBtn" class="btn btn-secondary full-width hidden">Изменить профиль</button>
       <button id="followBtn" class="btn btn-primary full-width hidden">Подписаться</button>
+
+      <!-- Форма редактирования -->
+      <div id="editForm" class="edit-form hidden">
+        <input type="text" id="editAvatarUrl" placeholder="Ссылка на аватарку (URL)">
+        <textarea id="editBioInput" placeholder="Описание профиля (био)"></textarea>
+        <button id="saveProfileBtn" class="btn btn-primary full-width">Сохранить</button>
+      </div>
     </div>
   </div>
 
+  <!-- Лента видео -->
   <main class="feed" id="videoContainer"></main>
 
   <script type="module" src="app.js"></script>
