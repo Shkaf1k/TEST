@@ -3,28 +3,26 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Мои Проекты</title>
+  <title>TikTok Web</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <h1 class="page-title">МОИ ВИДЕО</h1>
-
-  <div class="card-container" id="videoContainer">
-    <div class="card">
-      <h2 class="card-title">Загрузка...</h2>
-      <p class="card-description">Подключение к Firebase...</p>
-      <a href="#" class="card-link">Смотреть</a>
+  <!-- Верхний бар -->
+  <header class="navbar">
+    <div class="logo">TikTok</div>
+    <div class="auth-bar">
+      <input type="email" id="authEmail" placeholder="Email">
+      <input type="password" id="authPassword" placeholder="Пароль">
+      <button id="loginBtn" class="btn btn-primary">Войти</button>
+      <button id="logoutBtn" class="btn btn-secondary hidden">Выйти</button>
     </div>
-  </div>
+  </header>
 
-  <!-- Окно входа/регистрации -->
-  <div class="auth-box">
-    <input type="email" id="authEmail" placeholder="Email">
-    <input type="password" id="authPassword" placeholder="Пароль">
-    <button id="loginBtn">Войти</button>
-    <button id="logoutBtn" class="hidden">Выйти</button>
-  </div>
+  <!-- Контейнер для видео -->
+  <main class="feed" id="videoContainer">
+    <!-- Сда загрузятся карточки -->
+  </main>
 
   <script type="module" src="app.js"></script>
 </body>
