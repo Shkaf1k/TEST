@@ -3,12 +3,13 @@ import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from
 import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT.firebaseapp.com",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_PROJECT.appspot.com",
-  messagingSenderId: "YOUR_SENDER_ID",
-  appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyACr1SSptV2sjy8KwAeihcGH7wGlxcG7D8",
+  authDomain: "toktok-d643a.firebaseapp.com",
+  projectId: "toktok-d643a",
+  storageBucket: "toktok-d643a.firebasestorage.app",
+  messagingSenderId: "285685756382",
+  appId: "1:285685756382:web:ffc060fd3082f932cbed4f",
+  measurementId: "G-7NNFHFM5DF"
 };
 
 const app = initializeApp(firebaseConfig);
