@@ -1,18 +1,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { 
-  getAuth, 
-  createUserWithEmailAndPassword, 
-  signInWithEmailAndPassword, 
-  signOut, 
-  onAuthStateChanged 
-} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { 
-  getFirestore, 
-  collection, 
-  getDocs 
-} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-// Конфигурация Firebase (замените на свои данные из Firebase Console)
 const firebaseConfig = {
   apiKey: "YOUR_API_KEY",
   authDomain: "YOUR_PROJECT.firebaseapp.com",
@@ -26,113 +15,61 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// DOM Элементы
-const authModal = document.getElementById("authModal");
-const profileModal = document.getElementById("profileModal");
-const showAuthBtn = document.getElementById("showAuthBtn");
-const closeAuth = document.getElementById("closeAuth");
-const closeProfile = document.getElementById("closeProfile");
-const authSubmitBtn = document.getElementById("authSubmitBtn");
-const toggleAuthText = document.getElementById("toggleAuthText");
-const modalTitle = document.getElementById("modalTitle");
-const authEmail = document.getElementById("authEmail");
-const authPassword = document.getElementById("authPassword");
-const profileEmail = document.getElementById("profileEmail");
-const logoutBtn = document.getElementById("logoutBtn");
-const videoContainer = document.getElementById("videoContainer");
+const container = document.getElementById('videoContainer');
+const loginBtn = document.getElementById('loginBtn');
+const logoutBtn = document.getElementById('logoutBtn');
 
-let isSignUp = false;
-
-// Управление модальными окнами
-showAuthBtn.onclick = () => {
-  if (auth.currentUser) {
-    profileEmail.innerText = auth.currentUser.email;
-    profileModal.classList.remove("hidden");
-  } else {
-    authModal.classList.remove("hidden");
-  }
-};
-
-closeAuth.onclick = () => authModal.classList.add("hidden");
-closeProfile.onclick = () => profileModal.classList.add("hidden");
-
-// Переключение между Входом и Регистрацией
-toggleAuthText.onclick = () => {
-  isSignUp = !isSignUp;
-  modalTitle.innerText = isSignUp ? "Регистрация" : "Вход";
-  authSubmitBtn.innerText = isSignUp ? "Зарегистрироваться" : "Войти";
-  toggleAuthText.innerText = isSignUp ? "Уже есть аккаунт? Войти" : "Нет аккаунта? Зарегистрироваться";
-};
-
-// Регистрация / Вход
-authSubmitBtn.onclick = async () => {
-  const email = authEmail.value;
-  const password = authPassword.value;
-
+loginBtn.onclick = async () => {
+  const email = document.getElementById('authEmail').value;
+  const password = document.getElementById('authPassword').value;
   try {
-    if (isSignUp) {
-      await createUserWithEmailAndPassword(auth, email, password);
-    } else {
-      await signInWithEmailAndPassword(auth, email, password);
-    }
-    authModal.classList.add("hidden");
-    authEmail.value = "";
-    authPassword.value = "";
-  } catch (error) {
-    alert(error.message);
+    await signInWithEmailAndPassword(auth, email, password);
+  } catch (e) {
+    alert("Ошибка входа: " + e.message);
   }
 };
 
-// Выход из аккаунта
-logoutBtn.onclick = async () => {
-  await signOut(auth);
-  profileModal.classList.add("hidden");
-};
+logoutBtn.onclick = () => signOut(auth);
 
-// Отслеживание состояния пользователя
 onAuthStateChanged(auth, (user) => {
   if (user) {
-    showAuthBtn.innerText = "Профиль";
+    loginBtn.classList.add('hidden');
+    logoutBtn.classList.remove('hidden');
   } else {
-    showAuthBtn.innerText = "Войти";
+    loginBtn.classList.remove('hidden');
+    logoutBtn.classList.add('hidden');
   }
 });
 
-// Загрузка видео из Firestore
 async function loadVideos() {
   try {
     const querySnapshot = await getDocs(collection(db, "videos"));
-    videoContainer.innerHTML = "";
+    container.innerHTML = "";
     
+    if (querySnapshot.empty) {
+      container.innerHTML = `
+        <div class="card">
+          <h2 class="card-title">Видео не найдены</h2>
+          <p class="card-description">Добавьте документы в коллекцию "videos" в Firebase Firestore.</p>
+        </div>
+      `;
+      return;
+    }
+
     querySnapshot.forEach((doc) => {
       const data = doc.data();
-      createVideoCard(data.url, data.likes || 0);
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.innerHTML = `
+        <h2 class="card-title">${data.title || 'Название видео'}</h2>
+        <p class="card-description">${data.description || 'Описание видео'}</p>
+        <a href="${data.url}" target="_blank" class="card-link">Смотреть / Открыть</a>
+      `;
+      container.appendChild(card);
     });
   } catch (e) {
-    console.error("Ошибка загрузки видео: ", e);
+    console.error(e);
   }
-}
-
-function createVideoCard(url, likes) {
-  const card = document.createElement("div");
-  card.className = "video-card";
-  card.innerHTML = `
-    <video class="video-player" src="${url}" loop muted playsinline></video>
-    <div class="video-sidebar">
-      <button class="sidebar-btn">❤️ ${likes}</button>
-    </div>
-  `;
-
-  const video = card.querySelector("video");
-  card.onclick = () => {
-    if (video.paused) {
-      video.play();
-    } else {
-      video.pause();
-    }
-  };
-
-  videoContainer.appendChild(card);
 }
 
 loadVideos();
