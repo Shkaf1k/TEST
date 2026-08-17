@@ -25,7 +25,7 @@ loginBtn.onclick = async () => {
   try {
     await signInWithEmailAndPassword(auth, email, password);
   } catch (e) {
-    alert("Ошибка входа: " + e.message);
+    alert("Ошибка: " + e.message);
   }
 };
 
@@ -45,12 +45,11 @@ async function loadVideos() {
   try {
     const querySnapshot = await getDocs(collection(db, "videos"));
     container.innerHTML = "";
-    
+
     if (querySnapshot.empty) {
       container.innerHTML = `
-        <div class="card">
-          <h2 class="card-title">Видео не найдены</h2>
-          <p class="card-description">Добавьте документы в коллекцию "videos" в Firebase Firestore.</p>
+        <div class="video-card" style="padding: 20px; text-align: center;">
+          <p>Нет видео для отображения.</p>
         </div>
       `;
       return;
@@ -59,11 +58,13 @@ async function loadVideos() {
     querySnapshot.forEach((doc) => {
       const data = doc.data();
       const card = document.createElement('div');
-      card.className = 'card';
+      card.className = 'video-card';
       card.innerHTML = `
-        <h2 class="card-title">${data.title || 'Название видео'}</h2>
-        <p class="card-description">${data.description || 'Описание видео'}</p>
-        <a href="${data.url}" target="_blank" class="card-link">Смотреть / Открыть</a>
+        <video class="video-player" src="${data.url}" controls loop muted playsinline></video>
+        <div class="card-info">
+          <span class="card-title">${data.title || 'Без названия'}</span>
+          <button class="like-btn">❤️ ${data.likes || 0}</button>
+        </div>
       `;
       container.appendChild(card);
     });
