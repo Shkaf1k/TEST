@@ -15,10 +15,24 @@
       <input type="email" id="authEmail" placeholder="Email">
       <input type="password" id="authPassword" placeholder="Пароль">
       <button id="loginBtn" class="btn btn-primary">Войти</button>
+      <button id="addVideoBtn" class="btn btn-primary hidden">+ Видео</button>
       <button id="profileBtn" class="btn btn-secondary hidden">Профиль</button>
       <button id="logoutBtn" class="btn btn-secondary hidden">Выйти</button>
     </div>
   </header>
+
+  <!-- Модальное окно загрузки видео -->
+  <div id="uploadModal" class="modal hidden">
+    <div class="modal-content">
+      <span id="closeUpload" class="close">&times;</span>
+      <h2>Опубликовать видео</h2>
+      <div class="edit-form">
+        <input type="text" id="videoUrlInput" placeholder="Ссылка на видео (URL .mp4)">
+        <input type="text" id="videoTitleInput" placeholder="Название или описание">
+        <button id="publishVideoBtn" class="btn btn-primary full-width">Опубликовать</button>
+      </div>
+    </div>
+  </div>
 
   <!-- Модальное окно профиля -->
   <div id="profileModal" class="modal hidden">
@@ -51,7 +65,10 @@
 
       <!-- Форма редактирования -->
       <div id="editForm" class="edit-form hidden">
-        <input type="text" id="editAvatarUrl" placeholder="Ссылка на аватарку (URL)">
+        <label class="file-label">
+          Выберите аватар с ПК
+          <input type="file" id="avatarFileInput" accept="image/*" class="hidden-input">
+        </label>
         <textarea id="editBioInput" placeholder="Описание профиля (био)"></textarea>
         <button id="saveProfileBtn" class="btn btn-primary full-width">Сохранить</button>
       </div>
