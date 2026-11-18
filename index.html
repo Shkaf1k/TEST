@@ -1,83 +1,635 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" class="scroll-smooth">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TokTok</title>
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Harsh Winters 1.0.0 — Хардкорный Minecraft Сервер</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&family=Outfit:wght@600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --bg-void: #030712;
+            --aurora-cyan: #22d3ee;
+            --aurora-emerald: #34d399;
+            --aurora-violet: #818cf8;
+            --ice-border: rgba(186, 230, 253, 0.22);
+            --glass-fill: rgba(10, 19, 36, 0.62);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg-void);
+            color: #f1f5f9;
+            overflow-x: hidden;
+            margin: 0;
+        }
+
+        h1, h2, h3, .font-display {
+            font-family: 'Outfit', 'Inter', sans-serif;
+        }
+
+        .font-mono-tech {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Cosmic Arctic Mesh + Aurora Borealis */
+        .arctic-backdrop {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            background:
+                radial-gradient(ellipse 80% 50% at 50% -10%, rgba(34, 211, 238, 0.22), transparent 65%),
+                radial-gradient(ellipse 60% 45% at 12% 35%, rgba(52, 211, 153, 0.12), transparent 60%),
+                radial-gradient(ellipse 65% 50% at 88% 70%, rgba(129, 140, 248, 0.16), transparent 60%),
+                linear-gradient(180deg, #02050c 0%, #061021 48%, #030712 100%);
+        }
+
+        .aurora-ribbon {
+            position: fixed;
+            top: -15%;
+            left: -10%;
+            width: 120%;
+            height: 55vh;
+            z-index: 0;
+            pointer-events: none;
+            background: conic-gradient(
+                from 195deg at 50% 50%,
+                transparent 0deg,
+                rgba(34, 211, 238, 0.16) 65deg,
+                rgba(52, 211, 153, 0.22) 125deg,
+                rgba(129, 140, 248, 0.15) 190deg,
+                transparent 260deg
+            );
+            filter: blur(68px);
+            animation: auroraDrift 18s ease-in-out infinite alternate;
+        }
+
+        @keyframes auroraDrift {
+            0% { transform: translateY(0) scaleX(1) rotate(-2deg); opacity: 0.75; }
+            50% { transform: translateY(25px) scaleX(1.06) rotate(1.5deg); opacity: 1; }
+            100% { transform: translateY(-15px) scaleX(0.96) rotate(-1deg); opacity: 0.8; }
+        }
+
+        .frost-grid {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            background-image:
+                linear-gradient(to right, rgba(186, 230, 253, 0.03) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(186, 230, 253, 0.03) 1px, transparent 1px);
+            background-size: 64px 64px;
+            mask-image: radial-gradient(ellipse 75% 65% at 50% 35%, black 35%, transparent 100%);
+        }
+
+        .liquid-glass {
+            position: relative;
+            background: linear-gradient(155deg, rgba(17, 30, 54, 0.74) 0%, rgba(8, 15, 29, 0.82) 100%);
+            backdrop-filter: blur(22px) saturate(165%);
+            -webkit-backdrop-filter: blur(22px) saturate(165%);
+            border: 1px solid var(--ice-border);
+            box-shadow:
+                inset 0 1px 0 0 rgba(224, 242, 254, 0.28),
+                inset 0 -1px 0 0 rgba(34, 211, 238, 0.08),
+                0 22px 48px -16px rgba(2, 6, 23, 0.85);
+            overflow: hidden;
+        }
+
+        .liquid-glass::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            background: radial-gradient(
+                520px circle at var(--mouse-x, 50%) var(--mouse-y, 0%),
+                rgba(103, 232, 249, 0.16),
+                rgba(52, 211, 153, 0.05) 35%,
+                transparent 70%
+            );
+            pointer-events: none;
+            z-index: 1;
+            transition: opacity 0.35s ease;
+        }
+
+        .liquid-card {
+            transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.3s ease, box-shadow 0.35s ease;
+        }
+
+        .liquid-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(103, 232, 249, 0.52);
+            box-shadow:
+                inset 0 1px 0 0 rgba(224, 242, 254, 0.45),
+                0 28px 60px -15px rgba(8, 145, 178, 0.28);
+        }
+
+        .liquid-btn-primary {
+            background: linear-gradient(135deg, #a5f3fc 0%, #38bdf8 48%, #34d399 100%);
+            box-shadow:
+                inset 0 1px 1px rgba(255, 255, 255, 0.85),
+                0 10px 28px -6px rgba(56, 189, 248, 0.55);
+            transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .liquid-btn-primary:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.06);
+            box-shadow:
+                inset 0 1px 1px rgba(255, 255, 255, 0.95),
+                0 14px 36px -4px rgba(52, 211, 153, 0.6);
+        }
+
+        .liquid-btn-glass {
+            background: rgba(15, 28, 50, 0.65);
+            backdrop-filter: blur(14px);
+            border: 1px solid rgba(186, 230, 253, 0.25);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16);
+            transition: all 0.25s ease;
+        }
+
+        .liquid-btn-glass:hover {
+            background: rgba(24, 44, 76, 0.82);
+            border-color: rgba(103, 232, 249, 0.55);
+            transform: translateY(-2px);
+        }
+
+        .aurora-text {
+            background: linear-gradient(120deg, #ffffff 15%, #a5f3fc 45%, #6ee7b7 75%, #c7d2fe 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        #snowCanvas {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #030712; }
+        ::-webkit-scrollbar-thumb { background: rgba(56, 189, 248, 0.3); border-radius: 9999px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(56, 189, 248, 0.55); }
+    </style>
 </head>
-<body>
+<body class="antialiased selection:bg-cyan-400/30 selection:text-cyan-100">
 
-  <!-- Навигационная панель -->
-  <header class="navbar">
-    <div class="logo">TokTok</div>
-    <div class="auth-bar">
-      <input type="email" id="authEmail" placeholder="Email">
-      <input type="password" id="authPassword" placeholder="Пароль">
-      <button id="loginBtn" class="btn btn-primary">Войти</button>
-      <button id="addVideoBtn" class="btn btn-primary hidden">+ Видео</button>
-      <button id="profileBtn" class="btn btn-secondary hidden">Профиль</button>
-      <button id="logoutBtn" class="btn btn-secondary hidden">Выйти</button>
-    </div>
-  </header>
+    <!-- Background Layers -->
+    <div class="arctic-backdrop"></div>
+    <div class="aurora-ribbon"></div>
+    <div class="frost-grid"></div>
+    <canvas id="snowCanvas"></canvas>
 
-  <!-- Модальное окно загрузки видео -->
-  <div id="uploadModal" class="modal hidden">
-    <div class="modal-content">
-      <span id="closeUpload" class="close">&times;</span>
-      <h2>Опубликовать видео</h2>
-      <div class="edit-form">
-        <input type="text" id="videoUrlInput" placeholder="Ссылка на видео (URL .mp4)">
-        <input type="text" id="videoTitleInput" placeholder="Название или описание">
-        <button id="publishVideoBtn" class="btn btn-primary full-width">Опубликовать</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Модальное окно профиля -->
-  <div id="profileModal" class="modal hidden">
-    <div class="modal-content">
-      <span id="closeProfile" class="close">&times;</span>
-      
-      <div class="profile-header">
-        <img id="profileAvatar" src="https://via.placeholder.com/100" class="profile-avatar" alt="Avatar">
-        <h2 id="profileUsername">Имя пользователя</h2>
-        <p id="profileBio" class="profile-bio">Описание профиля отсутствует...</p>
-      </div>
-      
-      <div class="profile-stats">
-        <div class="stat-item">
-          <span id="followingCount" class="stat-num">0</span>
-          <span class="stat-label">Подписки</span>
+    <!-- Floating Toast Notification -->
+    <div id="glassToast" class="fixed bottom-6 right-6 z-50 pointer-events-none opacity-0 translate-y-4 transition-all duration-300">
+        <div class="liquid-glass rounded-2xl px-5 py-3.5 flex items-center gap-3.5 border border-cyan-300/45 shadow-2xl">
+            <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-cyan-400/30 to-emerald-400/30 border border-cyan-200/40 flex items-center justify-center text-cyan-200 shrink-0">
+                <i data-lucide="sparkles" class="w-4 h-4"></i>
+            </div>
+            <div>
+                <p id="toastTitle" class="text-sm font-bold text-white leading-tight">Уведомление</p>
+                <p id="toastSubtitle" class="text-xs text-cyan-200/90 mt-0.5">Действие выполнено</p>
+            </div>
         </div>
-        <div class="stat-item">
-          <span id="followersCount" class="stat-num">0</span>
-          <span class="stat-label">Подписчики</span>
-        </div>
-        <div class="stat-item">
-          <span id="likesCount" class="stat-num">0</span>
-          <span class="stat-label">Лайки</span>
-        </div>
-      </div>
-
-      <button id="editProfileBtn" class="btn btn-secondary full-width hidden">Изменить профиль</button>
-      <button id="followBtn" class="btn btn-primary full-width hidden">Подписаться</button>
-
-      <!-- Форма редактирования -->
-      <div id="editForm" class="edit-form hidden">
-        <label class="file-label">
-          Выберите аватар с ПК
-          <input type="file" id="avatarFileInput" accept="image/*" class="hidden-input">
-        </label>
-        <textarea id="editBioInput" placeholder="Описание профиля (био)"></textarea>
-        <button id="saveProfileBtn" class="btn btn-primary full-width">Сохранить</button>
-      </div>
     </div>
-  </div>
 
-  <!-- Лента видео -->
-  <main class="feed" id="videoContainer"></main>
+    <!-- TOP NAVIGATION BAR -->
+    <header class="fixed top-3 sm:top-5 inset-x-0 z-40 px-3 sm:px-6">
+        <nav class="max-w-7xl mx-auto liquid-glass rounded-2xl sm:rounded-full px-4 sm:px-6 py-2.5 flex items-center justify-between gap-3">
+            <a href="#hero" class="flex items-center gap-3 group shrink-0">
+                <div class="relative w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-400/30 via-sky-500/20 to-emerald-400/30 border border-cyan-200/45 flex items-center justify-center shadow-inner group-hover:scale-105 transition-transform">
+                    <i data-lucide="snowflake" class="w-5 h-5 text-cyan-200"></i>
+                    <span class="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-emerald-400 ring-2 ring-[#061021]"></span>
+                </div>
+                <div class="leading-none">
+                    <div class="flex items-center gap-1.5">
+                        <span class="font-display font-extrabold tracking-tight text-white text-sm sm:text-base">HARSH WINTERS</span>
+                        <span class="hidden sm:inline-block font-mono-tech text-[10px] font-bold px-1.5 py-0.5 rounded bg-cyan-400/20 text-cyan-200 border border-cyan-300/30">v1.0.0</span>
+                    </div>
+                    <span class="block text-[10px] font-mono-tech uppercase tracking-[0.2em] text-cyan-300/80 mt-1">Arctic Survival RPG</span>
+                </div>
+            </a>
 
-  <script type="module" src="app.js"></script>
+            <div class="hidden md:flex items-center gap-1 text-sm font-medium text-slate-300">
+                <a href="#hero" class="px-3.5 py-1.5 rounded-full hover:bg-white/10 hover:text-white transition-colors">О мире</a>
+                <a href="#features" class="px-3.5 py-1.5 rounded-full hover:bg-white/10 hover:text-white transition-colors">Механики</a>
+                <a href="#forum" class="px-3.5 py-1.5 rounded-full hover:bg-cyan-400/15 hover:text-cyan-200 transition-colors flex items-center gap-2">
+                    <span>Форум</span>
+                    <span class="px-1.5 py-0.2 rounded-full bg-emerald-400/20 border border-emerald-300/40 text-[10px] font-mono-tech font-bold text-emerald-300">LIVE</span>
+                </a>
+                <a href="#start" class="px-3.5 py-1.5 rounded-full hover:bg-white/10 hover:text-white transition-colors">Подключение</a>
+                <a href="#rules" class="px-3.5 py-1.5 rounded-full hover:bg-white/10 hover:text-white transition-colors">Кодекс</a>
+            </div>
+
+            <div class="flex items-center gap-2">
+                <button onclick="copyServerIP()" title="Скопировать IP сервера" class="hidden lg:flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-slate-900/70 hover:bg-slate-800/90 border border-cyan-300/25 transition-all text-xs cursor-pointer">
+                    <span class="relative flex h-2 w-2">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-400"></span>
+                    </span>
+                    <span class="font-mono-tech text-slate-200">Онлайн: <strong id="onlineCounter" class="text-emerald-300">42</strong>/100</span>
+                </button>
+
+                <button id="navLoginBtn" onclick="openAuthModal('login')" class="liquid-btn-primary px-4 py-2 rounded-full text-slate-950 font-extrabold text-xs sm:text-sm flex items-center gap-1.5 cursor-pointer">
+                    <i data-lucide="user-plus" class="w-3.5 h-3.5"></i>
+                    <span>Войти</span>
+                </button>
+
+                <div id="navUserPanel" class="hidden items-center gap-2 pl-2.5 pr-1.5 py-1 rounded-full bg-slate-900/80 border border-cyan-300/40">
+                    <div class="w-6 h-6 rounded-full bg-gradient-to-br from-cyan-300 to-emerald-400 flex items-center justify-center text-[11px] font-black text-slate-950 uppercase" id="navUserAvatar">
+                        S
+                    </div>
+                    <span id="navUserNickname" class="text-xs font-bold text-white max-w-[110px] truncate">Выживший</span>
+                    <button onclick="logoutUser()" title="Выйти" class="w-6 h-6 rounded-full hover:bg-rose-500/30 flex items-center justify-center text-slate-300 hover:text-rose-200 transition-colors cursor-pointer">
+                        <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
+                    </button>
+                </div>
+
+                <button id="mobileMenuBtn" aria-label="Меню" class="md:hidden w-9 h-9 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center text-white hover:bg-white/20 transition-colors">
+                    <i data-lucide="menu" class="w-4 h-4"></i>
+                </button>
+            </div>
+        </nav>
+
+        <div id="mobileMenu" class="hidden md:hidden max-w-7xl mx-auto mt-2 liquid-glass rounded-2xl p-3">
+            <div class="flex flex-col gap-1 text-sm font-medium text-slate-200">
+                <a href="#hero" onclick="closeMobileMenu()" class="px-4 py-2.5 rounded-xl hover:bg-white/10 text-white">О мире</a>
+                <a href="#features" onclick="closeMobileMenu()" class="px-4 py-2.5 rounded-xl hover:bg-white/10 text-white">Механики</a>
+                <a href="#forum" onclick="closeMobileMenu()" class="px-4 py-2.5 rounded-xl hover:bg-white/10 text-cyan-300 font-semibold">Форум выживших (Live)</a>
+                <a href="#start" onclick="closeMobileMenu()" class="px-4 py-2.5 rounded-xl hover:bg-white/10 text-white">Подключение</a>
+                <a href="#rules" onclick="closeMobileMenu()" class="px-4 py-2.5 rounded-xl hover:bg-white/10 text-white">Кодекс</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="relative z-10">
+        <!-- 1. HERO SECTION -->
+        <section id="hero" class="min-h-screen flex flex-col justify-center pt-32 pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center">
+                <div class="lg:col-span-7 text-center lg:text-left">
+                    <div class="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-cyan-400/10 border border-cyan-300/30 text-xs font-mono-tech font-bold text-cyan-200 mb-6">
+                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                        <span>FORGE 1.20.1 &bull; СЕЗОН I: ВЕЧНАЯ МЕРЗЛОТА</span>
+                    </div>
+
+                    <h1 class="text-4xl sm:text-6xl xl:text-7xl font-black tracking-tight leading-[1.04] text-white mb-6">
+                        Выживи там, где
+                        <span class="block aurora-text mt-1">замерзает даже сталь</span>
+                    </h1>
+
+                    <p class="text-base sm:text-lg text-slate-300/90 max-w-2xl mx-auto lg:mx-0 leading-relaxed mb-8">
+                        <strong class="text-white">Harsh Winters 1.0.0</strong> — атмосферный хардкор-сервер с динамической терморегуляцией, свирепыми буранами, реалистичной жаждой и глубокой системой ремесла. Здесь костёр ценнее алмазов.
+                    </p>
+
+                    <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-center lg:justify-start gap-3.5 mb-8">
+                        <button onclick="copyServerIP()" class="liquid-btn-primary px-6 py-4 rounded-2xl text-slate-950 font-extrabold text-sm sm:text-base flex items-center justify-center gap-3 cursor-pointer">
+                            <i data-lucide="copy" class="w-5 h-5"></i>
+                            <span class="font-mono-tech tracking-tight" id="heroServerIP">play.harshwinters.ru</span>
+                        </button>
+
+                        <a href="#forum" class="liquid-btn-glass px-6 py-4 rounded-2xl text-white font-bold text-sm sm:text-base flex items-center justify-center gap-2.5">
+                            <i data-lucide="radio" class="w-5 h-5 text-emerald-300"></i>
+                            <span>Радиостанция форума</span>
+                        </a>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-3 max-w-lg mx-auto lg:mx-0">
+                        <div class="rounded-2xl bg-white/[0.04] border border-white/10 p-3 text-center lg:text-left">
+                            <div class="text-[11px] font-mono-tech uppercase text-slate-400">Погода мира</div>
+                            <div id="liveTempBadge" class="text-base sm:text-lg font-mono-tech font-bold text-cyan-300 mt-0.5">-42&deg;C</div>
+                        </div>
+                        <div class="rounded-2xl bg-white/[0.04] border border-white/10 p-3 text-center lg:text-left">
+                            <div class="text-[11px] font-mono-tech uppercase text-slate-400">Стабильность</div>
+                            <div class="text-base sm:text-lg font-mono-tech font-bold text-emerald-300 mt-0.5">20.0 TPS</div>
+                        </div>
+                        <div class="rounded-2xl bg-white/[0.04] border border-white/10 p-3 text-center lg:text-left">
+                            <div class="text-[11px] font-mono-tech uppercase text-slate-400">Модов в сборке</div>
+                            <div class="text-base sm:text-lg font-mono-tech font-bold text-indigo-300 mt-0.5">148+</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-5">
+                    <div class="liquid-glass rounded-[32px] p-6 sm:p-8 border border-cyan-300/35 relative">
+                        <div class="relative z-10">
+                            <div class="flex items-center justify-between pb-5 mb-5 border-b border-white/10">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-cyan-400/25 to-emerald-400/25 border border-cyan-300/40 flex items-center justify-center text-cyan-200">
+                                        <i data-lucide="compass" class="w-6 h-6"></i>
+                                    </div>
+                                    <div>
+                                        <h2 class="text-lg font-bold text-white leading-tight">Сводка экспедиции</h2>
+                                        <p class="text-xs font-mono-tech text-emerald-300">СЕРВЕР ДОСТУПЕН 24/7</p>
+                                    </div>
+                                </div>
+                                <span class="px-3 py-1 rounded-full bg-emerald-400/15 border border-emerald-300/35 text-[11px] font-mono-tech font-bold text-emerald-300">
+                                    ONLINE
+                                </span>
+                            </div>
+
+                            <div class="space-y-4 mb-6">
+                                <div class="rounded-2xl bg-slate-950/60 border border-white/10 p-4">
+                                    <div class="flex items-center justify-between text-xs mb-2">
+                                        <span class="text-slate-300 flex items-center gap-1.5">
+                                            <i data-lucide="wind" class="w-3.5 h-3.5 text-cyan-300"></i>
+                                            Активность бурана
+                                        </span>
+                                        <span class="font-mono-tech font-bold text-cyan-300">Шторм 3-й категории</span>
+                                    </div>
+                                    <div class="w-full h-2 rounded-full bg-slate-800 overflow-hidden">
+                                        <div class="h-full w-4/5 rounded-full bg-gradient-to-r from-cyan-400 to-emerald-400"></div>
+                                    </div>
+                                </div>
+
+                                <div class="grid grid-cols-2 gap-3">
+                                    <div class="rounded-2xl bg-slate-950/60 border border-white/10 p-3.5">
+                                        <div class="text-[11px] text-slate-400 mb-1">Сложность</div>
+                                        <div class="text-sm font-bold text-white flex items-center gap-1.5">
+                                            <i data-lucide="skull" class="w-4 h-4 text-rose-400"></i>
+                                            Хардкор +
+                                        </div>
+                                    </div>
+                                    <div class="rounded-2xl bg-slate-950/60 border border-white/10 p-3.5">
+                                        <div class="text-[11px] text-slate-400 mb-1">Мир и вайпы</div>
+                                        <div class="text-sm font-bold text-white flex items-center gap-1.5">
+                                            <i data-lucide="globe" class="w-4 h-4 text-emerald-400"></i>
+                                            25 000 &times; 25 000
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button onclick="openDownloadModal()" class="w-full py-3.5 px-5 rounded-2xl bg-white/10 hover:bg-white/15 border border-cyan-300/35 text-white font-bold text-sm flex items-center justify-between transition-all cursor-pointer group">
+                                <span class="flex items-center gap-2.5">
+                                    <i data-lucide="download-cloud" class="w-5 h-5 text-cyan-300"></i>
+                                    <span>Скачать клиент Harsh Winters 1.0.0</span>
+                                </span>
+                                <span class="font-mono-tech text-xs text-cyan-300 group-hover:translate-x-1 transition-transform">ZIP / MRPACK &rarr;</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. FEATURES SECTION -->
+        <section id="features" class="py-20 sm:py-28 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+            <div class="text-center max-w-3xl mx-auto mb-14">
+                <span class="inline-block font-mono-tech text-xs font-bold uppercase tracking-[0.22em] text-cyan-300 mb-3">
+                    // ИСКУССТВО ВЫЖИВАНИЯ
+                </span>
+                <h2 class="text-3xl sm:text-5xl font-extrabold text-white tracking-tight mb-4">
+                    Мир, который испытывает на прочность
+                </h2>
+                <p class="text-slate-300/85 text-sm sm:text-base">
+                    Каждая механика сборки Harsh Winters 1.0.0 настроена для глубокого погружения и командного взаимодействия.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="liquid-glass liquid-card rounded-[28px] p-7 flex flex-col justify-between">
+                    <div class="relative z-10">
+                        <div class="w-12 h-12 rounded-2xl bg-cyan-400/15 border border-cyan-300/35 flex items-center justify-center text-cyan-300 mb-5">
+                            <i data-lucide="thermometer-snowflake" class="w-6 h-6"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-2.5">Живая терморегуляция</h3>
+                        <p class="text-sm text-slate-300/85 leading-relaxed">
+                            Переохлаждение замедляет движения и туманит взор. Утепляйте броню шерстью, пейте горячий травяной чай и стройте отапливаемые убежища.
+                        </p>
+                    </div>
+                    <div class="relative z-10 mt-6 pt-4 border-t border-white/10 text-xs font-mono-tech text-cyan-300">
+                        Cold Sweat + Tough As Nails
+                    </div>
+                </div>
+
+                <div class="liquid-glass liquid-card rounded-[28px] p-7 flex flex-col justify-between">
+                    <div class="relative z-10">
+                        <div class="w-12 h-12 rounded-2xl bg-emerald-400/15 border border-emerald-300/35 flex items-center justify-center text-emerald-300 mb-5">
+                            <i data-lucide="cloud-snow" class="w-6 h-6"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-2.5">Динамические бураны</h3>
+                        <p class="text-sm text-slate-300/85 leading-relaxed">
+                            Внезапные снежные штормы заметают тропы, снижают видимость до пары блоков и задувают незащищенные факелы.
+                        </p>
+                    </div>
+                    <div class="relative z-10 mt-6 pt-4 border-t border-white/10 text-xs font-mono-tech text-emerald-300">
+                        Primal Winter + Weather2
+                    </div>
+                </div>
+
+                <div class="liquid-glass liquid-card rounded-[28px] p-7 flex flex-col justify-between">
+                    <div class="relative z-10">
+                        <div class="w-12 h-12 rounded-2xl bg-indigo-400/15 border border-indigo-300/35 flex items-center justify-center text-indigo-300 mb-5">
+                            <i data-lucide="hammer" class="w-6 h-6"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-2.5">Реалистичное ремесло</h3>
+                        <p class="text-sm text-slate-300/85 leading-relaxed">
+                            Добыча кремня, ковка инструментов на наковальне, консервация припасов в погребах на долгую полярную ночь.
+                        </p>
+                    </div>
+                    <div class="relative z-10 mt-6 pt-4 border-t border-white/10 text-xs font-mono-tech text-indigo-300">
+                        Farmer's Delight + Create
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. FORUM SECTION -->
+        <section id="forum" class="py-20 sm:py-28 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+            <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
+                <div>
+                    <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-400/10 border border-emerald-300/30 text-xs font-mono-tech font-bold text-emerald-300 uppercase tracking-wider mb-3">
+                        <span class="relative flex h-2 w-2">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-400"></span>
+                        </span>
+                        <span>Радиостанция лагеря &bull; Лицензионный доступ</span>
+                    </div>
+                    <h2 class="text-3xl sm:text-5xl font-extrabold text-white tracking-tight mb-2">
+                        Форум выживших
+                    </h2>
+                    <p class="text-slate-300/85 text-sm sm:text-base max-w-2xl">
+                        Обсуждайте постройки, кооперируйтесь для экспедиций в ледяные руины и делитесь рецептами выживания.
+                    </p>
+                </div>
+
+                <button onclick="handleNewThreadClick()" class="liquid-btn-primary px-6 py-3.5 rounded-2xl text-slate-950 font-extrabold text-sm flex items-center gap-2 cursor-pointer">
+                    <i data-lucide="plus-circle" class="w-4 h-4"></i>
+                    <span>Создать обсуждение</span>
+                </button>
+            </div>
+
+            <!-- Threads container list -->
+            <div class="space-y-4" id="forumThreadsContainer">
+                <div class="liquid-glass rounded-2xl p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div class="flex items-start gap-4">
+                        <div class="w-10 h-10 rounded-xl bg-cyan-400/20 border border-cyan-300/30 flex items-center justify-center text-cyan-200 font-bold shrink-0">
+                            ❄️
+                        </div>
+                        <div>
+                            <h3 class="text-base font-bold text-white hover:text-cyan-300 transition-colors cursor-pointer">Экспедиция к руинам Затерянного Ледника [Координаты внутри]</h3>
+                            <p class="text-xs text-slate-400 mt-1">Автор: <strong class="text-slate-200">ArcticWolf</strong> &bull; 2 часа назад</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3 text-xs font-mono-tech text-slate-300 shrink-0">
+                        <span class="px-2.5 py-1 rounded-lg bg-white/5 border border-white/10">💬 18 ответов</span>
+                        <span class="px-2.5 py-1 rounded-lg bg-emerald-400/10 text-emerald-300 border border-emerald-300/20">Активно</span>
+                    </div>
+                </div>
+
+                <div class="liquid-glass rounded-2xl p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div class="flex items-start gap-4">
+                        <div class="w-10 h-10 rounded-xl bg-indigo-400/20 border border-indigo-300/30 flex items-center justify-center text-indigo-200 font-bold shrink-0">
+                            🔥
+                        </div>
+                        <div>
+                            <h3 class="text-base font-bold text-white hover:text-cyan-300 transition-colors cursor-pointer">Эффективные чертежи печей и термоизоляции базы</h3>
+                            <p class="text-xs text-slate-400 mt-1">Автор: <strong class="text-slate-200">FrostMage</strong> &bull; Вчера</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3 text-xs font-mono-tech text-slate-300 shrink-0">
+                        <span class="px-2.5 py-1 rounded-lg bg-white/5 border border-white/10">💬 34 ответа</span>
+                        <span class="px-2.5 py-1 rounded-lg bg-white/5 text-slate-300 border border-white/10">Закрыто</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Visual Context Representation -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
+        <div class="liquid-glass rounded-[32px] p-6 sm:p-10 text-center">
+            <h3 class="text-2xl font-bold text-white mb-4">Атмосфера полярной ночи</h3>
+            <p class="text-slate-300 max-w-xl mx-auto mb-6 text-sm">Уютное укрытие среди заснеженных елей — залог вашей безопасности от ледяных бурь.</p>
+            <div class="overflow-hidden rounded-2xl border border-cyan-300/30 shadow-2xl max-w-4xl mx-auto">
+                <Image src="image_agent_tag_9180346184004322866" alt="Уютная хижина в заснеженных горах" caption="Полярный лагерь Harsh Winters" />
+            </div>
+        </div>
+    </section>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // Инициализация иконок Lucide
+        lucide.createIcons();
+
+        // Снег на Canvas
+        const canvas = document.getElementById('snowCanvas');
+        const ctx = canvas.getContext('2d');
+        let width = canvas.width = window.innerWidth;
+        let height = canvas.height = window.innerHeight;
+
+        window.addEventListener('resize', () => {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        });
+
+        const flakes = Array.from({ length: 65 }, () => ({
+            x: Math.random() * width,
+            y: Math.random() * height,
+            radius: Math.random() * 2.2 + 0.8,
+            speedY: Math.random() * 0.8 + 0.3,
+            speedX: (Math.random() - 0.5) * 0.5
+        }));
+
+        function drawSnow() {
+            ctx.clearRect(0, 0, width, height);
+            ctx.fillStyle = 'rgba(224, 242, 254, 0.65)';
+            ctx.beginPath();
+            flakes.forEach(f => {
+                ctx.moveTo(f.x, f.y);
+                ctx.arc(f.x, f.y, f.radius, 0, Math.PI * 2);
+            });
+            ctx.fill();
+            updateSnow();
+            requestAnimationFrame(drawSnow);
+        }
+
+        function updateSnow() {
+            flakes.forEach(f => {
+                f.y += f.speedY;
+                f.x += f.speedX;
+                if (f.y > height) {
+                    f.y = -10;
+                    f.x = Math.random() * width;
+                }
+            });
+        }
+        drawSnow();
+
+        // Копирование IP
+        function copyServerIP() {
+            navigator.clipboard.writeText("play.harshwinters.ru");
+            showToast("IP скопирован!", "play.harshwinters.ru добавлен в буфер обмена");
+        }
+
+        // Уведомления Toast
+        function showToast(title, subtitle) {
+            const toast = document.getElementById('glassToast');
+            document.getElementById('toastTitle').innerText = title;
+            document.getElementById('toastSubtitle').innerText = subtitle;
+            toast.classList.remove('opacity-0', 'translate-y-4');
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-4');
+            }, 3000);
+        }
+
+        // Мобильное меню
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const mobileMenu = document.getElementById('mobileMenu');
+        mobileMenuBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+        function closeMobileMenu() {
+            mobileMenu.classList.add('hidden');
+        }
+
+        // Заглушки авторизации и форума
+        function openAuthModal(mode) {
+            const nick = prompt("Введите ваш официальный никнейм Minecraft (лицензия):");
+            if (nick && nick.trim().length > 2) {
+                document.getElementById('navLoginBtn').classList.add('hidden');
+                const userPanel = document.getElementById('navUserPanel');
+                userPanel.classList.remove('hidden');
+                userPanel.classList.add('flex');
+                document.getElementById('navUserNickname').innerText = nick.trim();
+                document.getElementById('navUserAvatar').innerText = nick.trim()[0].toUpperCase();
+                showToast("Успешный вход", `Добро пожаловать, ${nick}!`);
+            }
+        }
+
+        function logoutUser() {
+            document.getElementById('navUserPanel').classList.add('hidden');
+            document.getElementById('navLoginBtn').classList.remove('hidden');
+            showToast("Выход из системы", "Вы вышли из аккаунта");
+        }
+
+        function handleNewThreadClick() {
+            const userPanel = document.getElementById('navUserPanel');
+            if (userPanel.classList.contains('hidden')) {
+                alert("Для создания темы на форуме необходимо авторизоваться с лицензионным никнеймом Minecraft.");
+                openAuthModal('login');
+            } else {
+                const title = prompt("Введите заголовок обсуждения:");
+                if (title) {
+                    showToast("Тема создана", "Ваше обсуждение опубликовано на радиостанции!");
+                }
+            }
+        }
+
+        // Интерактивный спекулярный эффект мыши
+        window.addEventListener('mousemove', e => {
+            document.querySelectorAll('.liquid-glass').forEach(card => {
+                const rect = card.getBoundingClientRect();
+                card.style.setProperty('--mouse-x', `${e.clientX - rect.left}px`);
+                card.style.setProperty('--mouse-y', `${e.clientY - rect.top}px`);
+            });
+        });
+    </script>
 </body>
 </html>
